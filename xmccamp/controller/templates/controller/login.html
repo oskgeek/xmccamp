@@ -2,62 +2,63 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Login</title>
-
-<!-- BOOTSTRAP STYLES-->
+    <title>Login</title>
+    
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <!-- BOOTSTRAP STYLES-->
     <link href='{% static "controller/css/bootstrap.css" %}' rel="stylesheet">
-
-<!--CUSTOM STYLES-->
+    <!--CUSTOM STYLES-->
     <link href='{% static "controller/css/style.css" %}' rel="stylesheet">
-
-<!--[if lt IE 9]>
-<script src="js/html5shiv.js"></script>
-<script src="js/respond.min.js"></script>
-<![endif]-->
-
+    <!--[if lt IE 9]>
+        <script src="js/html5shiv.js"></script>
+        <script src="js/respond.min.js"></script>
+    <![endif]-->
+    
+    <style>
+        body { background-color: #1d1f21; }
+    </style>
+    
 </head>
 
 <body>
-        
-        <div class="row">
-                <div class="col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-2 col-md-4 col-md-offset-4">
-                        <div class="login-panel panel panel-default">
-                                <div class="panel-heading">Log in</div>
-                                <div class="panel-body">
-                                        <form role="form">
-                                                <fieldset>
-                                                        <div class="form-group">
-                                                                <input class="form-control" placeholder="E-mail" name="email" type="email" autofocus="">
-                                                        </div>
-                                                        <div class="form-group">
-                                                                <input class="form-control" placeholder="Password" name="password" type="password" value="">
-                                                        </div>
-                                                        <div class="checkbox">
-                                                                <label>
-                                                                        <input name="remember" type="checkbox" value="Remember Me">Remember Me
-                                                                </label>
-                                                        </div>
-                                                        <a href="index.html" class="btn btn-primary">Login</a>
-                                                </fieldset>
-                                        </form>
-                                </div>
-                        </div>
-                </div><!-- /.col-->
-        </div><!-- /.row -->    
-        
-                
+    <div class="row">
+        <div class=
+        "col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-2 col-md-4 col-md-offset-4">
+        <div class="login-panel panel panel-default">
+                <div class="panel-heading">
+                        <img src='{% static "controller/img/logo.png" %}' style="max-width:100%;height:auto;"/>
+                        <hr>
+                    <b>Log in</b>
+                </div>
 
-        <script src="js/jquery-1.11.1.min.js"></script>
-        <script src="js/bootstrap.min.js"></script>
-        <script src="js/chart.min.js"></script>
-        <script src="js/chart-data.js"></script>
-        <script src="js/easypiechart.js"></script>
-        <script src="js/easypiechart-data.js"></script>
-        <script src="js/bootstrap-datepicker.js"></script>
-        <script>
-                !function ($) {
+                <div class="panel-body">
+                    <form action="{{ request.get_full_path }}" class="form-horizontal" enctype="multipart/form-data" id="zform" method="POST">
+                        {% csrf_token %}
+                        <fieldset>
+                            <div class="form-group">
+                                <input autofocus="" class="form-control" name=
+                                "username" placeholder="Username" type="text">
+                            </div>
+
+                            <div class="form-group">
+                                <input class="form-control" name="password"
+                                placeholder="Password" type="password" value=
+                                "">
+                            </div>
+
+                            <div class="checkbox">
+                                <label><input name="remember_me" type="checkbox"
+                                value="Remember Me">Remember Me</label>
+                            </div>
+                            <input class="btn btn-primary pull-right" type="submit" value="Login"/>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div><!-- /.col-->
+    </div><!-- /.row --><script>
+            !function ($) {
                         $(document).on("click","ul.nav li.parent > a > span.icon", function(){            
                                 $(this).find('em:first').toggleClass("glyphicon-minus");          
                         }); 
@@ -70,7 +71,6 @@
                 $(window).on('resize', function () {
                   if ($(window).width() <= 767) $('#sidebar-collapse').collapse('hide')
                 })
-        </script>       
+    </script>
 </body>
-
 </html>

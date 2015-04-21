@@ -13,7 +13,7 @@ class Session(models.Model):
     def __unicode__(self):
         return self.name
 
-    def parse_fields(data):
+    def parse_fields(self, data):
         try:
             self.name = data['Session name']
             self.location = data['Session location']
@@ -38,19 +38,42 @@ class Parent(models.Model):
     def __unicode__(self):
         return self.full_name
 
-    def parse_fields(data):
+    def parse_fields(self, data, level):
         try:
-            self.full_name = data['Secondary P/G: Name']
-            self.gender = data['Secondary P/G: Gender']
-            self.email_address = data['Secondary P/G: Email address']
-            self.home_phone_number = data['Secondary P/G: Home phone number']
-            self.cell_phone_number = data['Secondary P/G: Cell phone number']
-            self.business_phone_number = data['Secondary P/G: Business phone number']
+            if level == 'S':
+                full_name = data['Secondary P/G: Name']
+                gender = data['Secondary P/G: Gender']
+                email_address = data['Secondary P/G: Email address']
+                home_phone_number = data['Secondary P/G: Home phone number']
+                cell_phone_number = data['Secondary P/G: Cell phone number']
+                business_phone_number = data['Secondary P/G: Business phone number']
+            else:
+                full_name = data['Primary P/G: Name']
+                gender = data['Primary P/G: Gender']
+                email_address = data['Primary P/G: Email address']
+                home_phone_number = data['Primary P/G: Home phone number']
+                cell_phone_number = data['Primary P/G: Cell phone number']
+                business_phone_number = data['Primary P/G: Business phone number']
+                
+            self.full_name = full_name
+            self.gender = gender
+            self.email_address = email_address
+            self.home_phone_number = home_phone_number
+            self.cell_phone_number = cell_phone_number
+            self.business_phone_number = business_phone_number
+            
+            user = User.objects.create_user(username=full_name, 
+                                            email=email_address, 
+                                            password=full_name)
+            user.save()
+            self.user = user
+        
         except KeyError:
             pass
 
 
 class Cadet(models.Model):
+    sessions = models.ForeignKey(Session)
     i_cadet = models.AutoField(primary_key=True)
     full_name = models.CharField(max_length=255)
     age_today = models.IntegerField(max_length=255)
@@ -67,12 +90,12 @@ class Cadet(models.Model):
     contact_number = models.IntegerField(max_length=255, blank=True, null=True)
     secondary_parent = models.ForeignKey(Parent, related_name='secondary_parent')
     usac_training_program = models.CharField(max_length=255, blank=True, null=True)
-    goal = models.TextField(blank=True, null=True, verbose_name="Why join XMC Camp?")
+    goal = models.TextField(blank=True, null=True, verbose_name="Why join XMC Camp?")    
 
     def __unicode__(self):
         return self.full_name
 
-    def parse_fields(data):
+    def parse_fields(self, data):
         try:
             self.full_name = data['Participant: Name']
             self.age_today = data['Participant: Age as of today']
@@ -88,7 +111,7 @@ class Cadet(models.Model):
             self.usac_training_program = data['Participant: USAC Training Program']
             self.zip_code = data['Participant: Zip code']
             self.goal = data['Participant: Please explain what you would like to have your son or daugher accomplish while at camp?  Explain any special situations or other information the staff should know about your child.']
-
+            
         except KeyError:
             pass
 

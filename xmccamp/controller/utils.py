@@ -46,12 +46,11 @@ def register_cadets(file_path, msg=None):
                 
                 print "creating parents"
                 primary_parent_obj = Parent()
-                primary_parent_obj.parse_fields(field_dict, 'P')
-                primary_parent_obj.save()
+                primary_parent_obj.create_parent_by_fields(field_dict, 'P')
                 
                 secondary_parent_obj = Parent()
-                secondary_parent_obj.parse_fields(field_dict, 'S')
-                secondary_parent_obj.save()
+                secondary_parent_obj.create_parent_by_fields(field_dict, 'S')
+                
                 
                 print "creating sessions"
                 session_obj = Session()

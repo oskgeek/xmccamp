@@ -1,6 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 
+class UserProfile(models.Model):
+    user = models.OneToOneField(User)
+    group = models.CharField(max_length=255)
+    
+    def __unicode__(self):
+        return self.user.username
 
 class Session(models.Model):
     i_session = models.AutoField(primary_key=True)
@@ -27,7 +34,7 @@ class Session(models.Model):
 
 class Parent(models.Model):
     i_parent = models.AutoField(primary_key=True)
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(UserProfile)
     full_name = models.CharField(max_length=255)
     gender = models.CharField(max_length=5, blank=True, null=True)
     email_address = models.CharField(max_length=255, blank=True, null=True)
@@ -38,8 +45,9 @@ class Parent(models.Model):
     def __unicode__(self):
         return self.full_name
 
-    def parse_fields(self, data, level):
+    def create_parent_by_fields(self, data, level):
         try:
+            user_profile = UserProfile()
             if level == 'S':
                 full_name = data['Secondary P/G: Name']
                 gender = data['Secondary P/G: Gender']
@@ -47,6 +55,7 @@ class Parent(models.Model):
                 home_phone_number = data['Secondary P/G: Home phone number']
                 cell_phone_number = data['Secondary P/G: Cell phone number']
                 business_phone_number = data['Secondary P/G: Business phone number']
+                user_profile.group = 'PS'
             else:
                 full_name = data['Primary P/G: Name']
                 gender = data['Primary P/G: Gender']
@@ -54,6 +63,7 @@ class Parent(models.Model):
                 home_phone_number = data['Primary P/G: Home phone number']
                 cell_phone_number = data['Primary P/G: Cell phone number']
                 business_phone_number = data['Primary P/G: Business phone number']
+                user_profile.group = 'PP'
                 
             self.full_name = full_name
             self.gender = gender
@@ -62,11 +72,15 @@ class Parent(models.Model):
             self.cell_phone_number = cell_phone_number
             self.business_phone_number = business_phone_number
             
-            user = User.objects.create_user(username=full_name, 
-                                            email=email_address, 
-                                            password=full_name)
-            user.save()
-            self.user = user
+            try:
+                user = User(username=full_name, password=full_name, email=email_address)
+                user.save()
+                user_profile.user = user
+                user_profile.save()
+                self.user = user_profile
+                self.save()
+            except IntegrityError:
+                pass
         
         except KeyError:
             pass
@@ -117,7 +131,7 @@ class Cadet(models.Model):
 
 class PXManager(models.Model):
     i_px_manager = models.AutoField(primary_key=True)
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(UserProfile)
     full_name = models.CharField(max_length=255)
     gender = models.CharField(max_length=5, blank=True, null=True)
     email_address = models.CharField(max_length=255, blank=True, null=True)

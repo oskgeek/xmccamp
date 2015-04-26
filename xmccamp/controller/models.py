@@ -38,14 +38,15 @@ class Parent(models.Model):
     full_name = models.CharField(max_length=255)
     gender = models.CharField(max_length=5, blank=True, null=True)
     email_address = models.CharField(max_length=255, blank=True, null=True)
-    cell_phone_number = models.IntegerField(max_length=255, blank=True, null=True)
-    business_phone_number = models.IntegerField(max_length=255, blank=True, null=True)
-    home_phone_number = models.IntegerField(max_length=255, blank=True, null=True)
+    cell_phone_number = models.CharField(max_length=255, blank=True, null=True)
+    business_phone_number = models.CharField(max_length=255, blank=True, null=True)
+    home_phone_number = models.CharField(max_length=255, blank=True, null=True)
 
     def __unicode__(self):
         return self.full_name
 
     def create_parent_by_fields(self, data, level):
+        status = True
         try:
             user_profile = UserProfile()
             if level == 'S':
@@ -80,10 +81,13 @@ class Parent(models.Model):
                 self.user = user_profile
                 self.save()
             except IntegrityError:
-                pass
+                status = False
         
-        except KeyError:
-            pass
+        except KeyError as ex:
+            print ex
+            status = False
+            
+        return status
 
 
 class Cadet(models.Model):
@@ -110,6 +114,7 @@ class Cadet(models.Model):
         return self.full_name
 
     def parse_fields(self, data):
+        status = True
         try:
             self.full_name = data['Participant: Name']
             self.age_today = data['Participant: Age as of today']
@@ -126,8 +131,14 @@ class Cadet(models.Model):
             self.zip_code = data['Participant: Zip code']
             self.goal = data['Participant: Please explain what you would like to have your son or daugher accomplish while at camp?  Explain any special situations or other information the staff should know about your child.']
             
-        except KeyError:
-            pass
+        except KeyError as ex:
+            print ex
+            status = False
+        
+        except IntegrityError:
+            status = False
+        
+        return status
 
 class PXManager(models.Model):
     i_px_manager = models.AutoField(primary_key=True)

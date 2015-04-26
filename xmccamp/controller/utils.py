@@ -46,10 +46,10 @@ def register_cadets(file_path, msg=None):
                 
                 print "creating parents"
                 primary_parent_obj = Parent()
-                primary_parent_obj.create_parent_by_fields(field_dict, 'P')
+                pp_status = primary_parent_obj.create_parent_by_fields(field_dict, 'P')
                 
                 secondary_parent_obj = Parent()
-                secondary_parent_obj.create_parent_by_fields(field_dict, 'S')
+                sp_status = secondary_parent_obj.create_parent_by_fields(field_dict, 'S')
                 
                 
                 print "creating sessions"
@@ -59,11 +59,18 @@ def register_cadets(file_path, msg=None):
                 
                 print "creating cadet profile"
                 cadet_obj = Cadet()
-                cadet_obj.parse_fields(field_dict)
-                cadet_obj.primary_parent = primary_parent_obj
-                cadet_obj.secondary_parent = secondary_parent_obj
-                cadet_obj.sessions = session_obj
-                cadet_obj.save()
+                cd_status = cadet_obj.parse_fields(field_dict)
+                if cd_status:
+                    if pp_status:
+                        cadet_obj.primary_parent = primary_parent_obj
+                        
+                        if sp_status:
+                            cadet_obj.secondary_parent = secondary_parent_obj
+                        else:
+                            cadet_obj.secondary_parent = primary_parent_obj
+                            
+                        cadet_obj.sessions = session_obj
+                        cadet_obj.save()
 
 
     except Exception as ex:

@@ -74,6 +74,7 @@ class Parent(models.Model):
             self.business_phone_number = business_phone_number
             
             try:
+                print "===============", full_name
                 user = User(username=full_name, password=full_name, email=email_address)
                 user.save()
                 user_profile.user = user

@@ -12,9 +12,7 @@ def login(request):
         if user is not None:
             # the password verified for the user
             if user.is_active:
-                print("User is valid, active and authenticated")
-                if not request.POST.get('remember_me', None):
-                    request.session.set_expiry(0)
+                
                 return redirect('home/')
                 
             else:

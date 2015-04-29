@@ -44,6 +44,8 @@ def register_cadets(file_path, msg=None):
                     except KeyError:
                         pass
                 
+                if not any(field_dict.values()):
+                    continue
                 print "creating parents"
                 primary_parent_obj = Parent()
                 pp_status = primary_parent_obj.create_parent_by_fields(field_dict, 'P')

@@ -8,13 +8,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
 
-def login(request):
+def pxlogin(request):
     response_dict = {'status': 'FAILED'}
     if request.method == 'POST':
         username = request.POST.get('username', None)
         password = request.POST.get('password', None)
-        user = get_object_or_404(User, username=username, password=password)
-        user = authenticate(username='john', password='secret')
+        user = authenticate(username=username, password=password)
         
         if user is not None:
             # the password verified for the user

@@ -355,3 +355,289 @@ footer {
         visibility:hidden;
     }
 }
+
+/*-- Login Form Style --*/
+
+@font-face {
+      font-family: 'Roboto-Thin';
+        src: url('{{ STATIC_URL }}bootstrap_toolkit_extras/font/roboto/Roboto-Thin.ttf') format('truetype');
+    }
+    @font-face {
+      font-family: 'Roboto-Light';
+        src: url('{{ STATIC_URL }}bootstrap_toolkit_extras/font/roboto/Roboto-Light.ttf') format('truetype');
+    }
+    .field-error {
+      padding-top: 7px;      
+      color: red;
+      width: 90%;
+      margin-left: 14px;      
+    }
+    #bitsauto_login{
+      margin-top: 30px;
+      margin-bottom: 40px;
+    }
+    .btn{
+        border-radius: 0px;
+        width: 98.5% !important;
+    }
+    input[type="text"],input[type="password"]{
+        border: inherit;
+        border-bottom: 1px solid #757575;
+        height: inherit;
+        background-color: transparent;  
+        box-shadow: inherit;
+    }
+    .head, .subhead {
+      font-family: "Roboto-Thin", 'Helvetica Neue, Helvetica, Arial', sans-serif;
+      text-align: center;
+    }
+    .form-group {
+      position: relative;
+      margin-top: 35px;
+      margin-bottom: 20px;
+    }
+    .input-group {
+      position: relative;
+    }
+    .form-control {
+      display: block;
+      height: 36px;
+      width: 95%;
+      border: none;
+      border-radius: 0 !important;
+      font-size: 16px;
+      font-weight: 300;
+      padding: 0;
+      background-color: transparent;
+      box-shadow: none;
+      border-bottom: 1px solid #757575;
+    }
+    .input-group .form-control {
+      position: relative;
+      z-index: inherit;
+      float: inherit;
+      width: 100%;
+      margin-bottom: 0;
+    }
+    .form-control:focus {
+      border-color: #757575;
+      outline: none;
+      box-shadow: none;
+    }
+    /* -- label styles ---------------------------------- */
+    label {
+      position: absolute;
+      top: -18px;
+      color: #999;
+      font-size: 12px;
+      font-weight: 300;
+      transition: 0.2s ease all;
+      -moz-transition: 0.2s ease all;
+      -webkit-transition: 0.2s ease all;
+    }
+    .float-label {
+      left: 0;
+      top: 7px;
+      font-size: 16px;
+      pointer-events: none;
+      font-family: "Roboto-Light", 'Helvetica Neue, Helvetica, Arial', sans-serif;
+    }
+    /* active state */
+    input.form-control:valid ~ .float-label,
+    input.form-control:focus ~ .float-label{
+      top: -18px;
+      font-size: 12px;
+    }
+    .form-horizontal .control-label {
+      position: relative;
+      top: 0;
+      margin-bottom: 0;
+    }
+    @media (min-width: 768px) {
+      .form-horizontal .control-label {
+        font-size: 16px;
+      }
+    }
+    /* -- highlighter styles ------------------------------ */
+    .form-highlight {
+      position: absolute;
+      height: 60%;
+      width: 60px;
+      top: 25%;
+      left: 0;
+      pointer-events: none;
+      opacity: 0.4;
+    }
+    /* active state */
+    .form-control:focus ~ .form-highlight {
+      -webkit-animation: inputHighlighter 0.3s ease;
+      -moz-animation: inputHighlighter 0.3s ease;
+      animation: inputHighlighter 0.3s ease;
+    }
+    /* -- highlighter animation --------------------------- */
+    @-webkit-keyframes inputHighlighter {
+      from {
+        background: #5264AE;
+      }
+      to {
+        width: 0;
+        background: transparent;
+      }
+    }
+    @-moz-keyframes inputHighlighter {
+      from {
+        background: #5264AE;
+      }
+      to {
+        width: 0;
+        background: transparent;
+      }
+    }
+    @keyframes inputHighlighter {
+      from {
+        background: #5264AE;
+      }
+      to {
+        width: 0;
+        background: transparent;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .form-inline .radio label,
+      .form-inline .checkbox label {
+        padding-left: 5px;
+      }
+    }
+    .form-control-static {
+      font-size: 16px;
+    }
+    .form-control[disabled],
+    .form-control[readonly],
+    fieldset[disabled] .form-control {
+      background-color: transparent;
+      border-bottom-style: dashed;
+    }
+    #focusedInput {
+      border-color: #ccc;
+      border-color: rgba(82, 168, 236, 0.8);
+      outline: 0;
+      box-shadow: none;
+    }
+    /* -- import Bootstrap v3 ----------------------------- */
+    /* -- import Roboto Font ------------------------------ */
+    /* -- body styles ------------------------------------- */
+
+
+    /* -- login paper styles ------------------------------ */
+    .signin-card {
+      max-width: 300px;
+      border-radius: 0px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #eceff1;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    }
+    .signin-card .logo-image,
+    .signin-card h1,
+    .signin-card p {
+      text-align: center;
+    }
+    /* -- font styles ------------------------------------- */
+    .subhead {
+      font-size: 16px;
+      font-weight: 300;
+      line-height: 1.1;
+      color: #212121;
+      text-transform: inherit;
+      letter-spacing: inherit;
+    }
+    /* card animation from Animate.css -------------------- */
+    @-webkit-keyframes cardEnter {
+      0%,
+      20%,
+      40%,
+      60%,
+      80%,
+      100% {
+        -webkit-transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+        transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+      }
+      0% {
+        opacity: 0;
+        -webkit-transform: scale3d(0.3, 0.3, 0.3);
+        -ms-transform: scale3d(0.3, 0.3, 0.3);
+        transform: scale3d(0.3, 0.3, 0.3);
+      }
+      20% {
+        -webkit-transform: scale3d(1.1, 1.1, 1.1);
+        -ms-transform: scale3d(1.1, 1.1, 1.1);
+        transform: scale3d(1.1, 1.1, 1.1);
+      }
+      40% {
+        -webkit-transform: scale3d(0.9, 0.9, 0.9);
+        -ms-transform: scale3d(0.9, 0.9, 0.9);
+        transform: scale3d(0.9, 0.9, 0.9);
+      }
+      60% {
+        opacity: 1;
+        -webkit-transform: scale3d(1.03, 1.03, 1.03);
+        -ms-transform: scale3d(1.03, 1.03, 1.03);
+        transform: scale3d(1.03, 1.03, 1.03);
+      }
+      80% {
+        -webkit-transform: scale3d(0.97, 0.97, 0.97);
+        -ms-transform: scale3d(0.97, 0.97, 0.97);
+        transform: scale3d(0.97, 0.97, 0.97);
+      }
+      100% {
+        opacity: 1;
+        -webkit-transform: scale3d(1, 1, 1);
+        -ms-transform: scale3d(1, 1, 1);
+        transform: scale3d(1, 1, 1);
+      }
+    }
+    @keyframes cardEnter {
+      0%,
+      20%,
+      40%,
+      60%,
+      80%,
+      100% {
+        -webkit-transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+        transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+      }
+      0% {
+        opacity: 0;
+        -webkit-transform: scale3d(0.3, 0.3, 0.3);
+        -ms-transform: scale3d(0.3, 0.3, 0.3);
+        transform: scale3d(0.3, 0.3, 0.3);
+      }
+      20% {
+        -webkit-transform: scale3d(1.1, 1.1, 1.1);
+        -ms-transform: scale3d(1.1, 1.1, 1.1);
+        transform: scale3d(1.1, 1.1, 1.1);
+      }
+      40% {
+        -webkit-transform: scale3d(0.9, 0.9, 0.9);
+        -ms-transform: scale3d(0.9, 0.9, 0.9);
+        transform: scale3d(0.9, 0.9, 0.9);
+      }
+      60% {
+        opacity: 1;
+        -webkit-transform: scale3d(1.03, 1.03, 1.03);
+        -ms-transform: scale3d(1.03, 1.03, 1.03);
+        transform: scale3d(1.03, 1.03, 1.03);
+      }
+      80% {
+        -webkit-transform: scale3d(0.97, 0.97, 0.97);
+        -ms-transform: scale3d(0.97, 0.97, 0.97);
+        transform: scale3d(0.97, 0.97, 0.97);
+      }
+      100% {
+        opacity: 1;
+        -webkit-transform: scale3d(1, 1, 1);
+        -ms-transform: scale3d(1, 1, 1);
+        transform: scale3d(1, 1, 1);
+      }
+    }

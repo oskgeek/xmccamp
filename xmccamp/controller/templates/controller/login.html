@@ -7,7 +7,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1" name="viewport">
     <!-- BOOTSTRAP STYLES-->
-    <link href='{% static "controller/css/bootstrap.css" %}' rel="stylesheet">
+    <link href='{% static "controller/css/bootstrap.min.css" %}' rel="stylesheet">
     <!--CUSTOM STYLES-->
     <link href='{% static "controller/css/style.css" %}' rel="stylesheet">
     <!--[if lt IE 9]>
@@ -22,55 +22,54 @@
 </head>
 
 <body>
-    <div class="row">
-        <div class=
-        "col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-2 col-md-4 col-md-offset-4">
-        <div class="login-panel panel panel-default">
-                <div class="panel-heading">
-                        <img src='{% static "controller/img/logo.png" %}' style="max-width:100%;height:auto;"/>
-                        <hr>
-                    <b>Log in</b>
-                </div>
-
-                <div class="panel-body">
-                    <form action="{{ request.get_full_path }}" class="form-horizontal" enctype="multipart/form-data" id="zform" method="POST">
-                        {% csrf_token %}
-                        <fieldset>
-                            <div class="form-group">
-                                <input autofocus="" class="form-control" name=
-                                "username" placeholder="Username" type="text">
-                            </div>
-
-                            <div class="form-group">
-                                <input class="form-control" name="password"
-                                placeholder="Password" type="password" value=
-                                "">
-                            </div>
-
-                            <div class="checkbox">
-                                <label><input name="remember_me" type="checkbox"
-                                value="Remember Me">Remember Me</label>
-                            </div>
-                            <input class="btn btn-primary pull-right" type="submit" value="Login"/>
-                        </fieldset>
-                    </form>
-                </div>
+    <div class="container">
+        <div id="bitsauto_login" class="signin-card">
+            <div class="logo-image">
+                <img src='{% static "controller/img/logo.png" %}' alt="Logo" title="Logo" width="138" class="img-rounded">
             </div>
-        </div><!-- /.col-->
-    </div><!-- /.row --><script>
-            !function ($) {
-                        $(document).on("click","ul.nav li.parent > a > span.icon", function(){            
-                                $(this).find('em:first').toggleClass("glyphicon-minus");          
-                        }); 
-                        $(".sidebar span.icon").find('em:first').addClass("glyphicon-plus");
-                }(window.jQuery);
+            <h4 class="head">Extreme Military Challange<sup>&#8482;</sup></h4>
+            <p class="subhead">Login</p>
+            <form id="zform" class="form-horizontal" method="POST" action="{{ request.get_full_path }}" enctype="multipart/form-data">
+            {% csrf_token %}
+                <div id="form-login-username" class="form-group">
+                  <input id="id_login_username" class="form-control" name="username" type="text" size="30" alt="username" required />
+                  <span class="form-highlight"></span>
+                  <span class="form-bar"></span>
+                  <label for="id_login_username" class="float-label">Username</label>
+                </div>
+                <div id="form-login-password" class="form-group">
+                  <!-- <input type="text" style="display:none"> -->
+                  <!-- <input type="password" style="display:none"> -->
+                  <input id="id_login_password" class="form-control" name="password" type="password" size="30" alt="password" required />
+                  <span class="form-highlight"></span>
+                  <span class="form-bar"></span>
+                  <label for="id_login_password" class="float-label">Password</label>
+                </div>
+                <div class="checkbox form-group">
+                    <label><input name="remember_me" type="checkbox" value="Remember Me">Remember Me</label>
+                </div>
+                <div>
+                  <input id="signin" class="btn btn-block btn-primary ripple-effect" type="submit" name="Submit" alt="sign in" value="Sign in"/> 
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // !function ($) {
+        //     $(document).on("click","ul.nav li.parent > a > span.icon", function(){            
+        //             $(this).find('em:first').toggleClass("glyphicon-minus");          
+        //     }); 
+        //     $(".sidebar span.icon").find('em:first').addClass("glyphicon-plus");
+        // }(window.jQuery);
 
-                $(window).on('resize', function () {
-                  if ($(window).width() > 768) $('#sidebar-collapse').collapse('show')
-                })
-                $(window).on('resize', function () {
-                  if ($(window).width() <= 767) $('#sidebar-collapse').collapse('hide')
-                })
+        // $(window).on('resize', function () {
+        //     if ($(window).width() > 768) $('#sidebar-collapse').collapse('show')
+        // })
+        // $(window).on('resize', function () {
+        //     if ($(window).width() <= 767) $('#sidebar-collapse').collapse('hide')
+        // })
     </script>
+    <script src='{% static "controller/js/bootstrap.min.js" %}' type="text/javascript" charset="utf-8" async defer></script>
 </body>
 </html>

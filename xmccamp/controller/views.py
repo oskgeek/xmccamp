@@ -27,7 +27,7 @@ def pxlogin(request):
             # the authentication system was unable to verify the username and password
             return HttpResponse(json.dumps(response_dict))
     
-    return render(request, 'controller/login.html')
+    return render(request, 'controller/pages/login.html')
 
 
 @login_required
@@ -37,7 +37,7 @@ def logout_view(request):
     
 @login_required
 def dashboard(request):
-    return render(request, 'controller/index.html')
+    return render(request, 'controller/pages/index.html')
 
 
 @login_required

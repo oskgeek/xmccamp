@@ -34,11 +34,13 @@ def pxlogin(request):
 def logout_view(request):
     logout(request)
 
-    
 @login_required
 def dashboard(request):
     return render(request, 'controller/pages/index.html')
 
+@login_required
+def cadets_list(request):
+    return render(request, 'controller/pages/tables.html')
 
 @login_required
 def get_cadet_list_json(request):

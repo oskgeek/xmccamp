@@ -10,7 +10,7 @@ from controller.models import Cadet, Parent, Session
 
 
 def pxlogin(request):
-    response_dict = {'status': 'FAILED'}
+    response_dict = {'status': 'FAILED', 'Error': []}
     if request.method == 'POST':
         username = request.POST.get('username', None)
         password = request.POST.get('password', None)
@@ -27,6 +27,7 @@ def pxlogin(request):
                 return HttpResponse(json.dumps(response_dict))
         else:
             # the authentication system was unable to verify the username and password
+            response_dict['Error'] = 'Sorry, unable to verify provided credentials, try again!'
             return HttpResponse(json.dumps(response_dict))
     
     return render(request, 'controller/pages/login.html')

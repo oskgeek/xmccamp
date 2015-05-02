@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 
 from django.contrib.auth.models import User
+from controller.models import Cadet, Parent, Session
 
 
 def pxlogin(request):

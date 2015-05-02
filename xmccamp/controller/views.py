@@ -22,8 +22,9 @@ def pxlogin(request):
                 print("User is valid, active and authenticated")
                 login(request, user)
                 if not request.POST.get('remember_me', None):
-                    request.session.set_expiry(0)                
-                return redirect('/home/')
+                    request.session.set_expiry(0)          
+                response_dict['status'] = 'OK'
+                return HttpResponse(json.dumps(response_dict))
         else:
             # the authentication system was unable to verify the username and password
             return HttpResponse(json.dumps(response_dict))

@@ -36,10 +36,6 @@ def pxlogin(request):
 
 
 @login_required
-def pxsignup(request):
-    return render(request, 'controller/pages/signup.html')
-
-@login_required
 def logout_view(request):
     logout(request)
 
@@ -84,8 +80,16 @@ def parent_send_emails(request):
     return HttpResponse(json.dumps(response_dict))
 
 
-@login_required
 def parent_registration(request):
-    return render(request, 'controller/pages/tables.html')
+    response = None
+    if 'code' in request.GET:
+        secret_code = request.GET['code']
+        try:
+            parent_obj = Parent.objects.get(secret_code=secret_code)
+            parent_dict = parent_obj.__dict__
+            response = render(request, 'controller/pages/signup.html', context=parent_dict)
+        except Parent.DoesNotExist:
+            response = render(request, 'controller/pages/access_denied.html', context=parent_dict)
+    return response    
 
 

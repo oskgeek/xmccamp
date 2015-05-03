@@ -552,9 +552,9 @@
                             data: {
                                 "cadet_file" : "#zformemail"
                             },
-                            success: function( response ) {
-                                var res = JSON.parse(response);
-                                
+                            success: function( res ) {
+                                var res = JSON.parse(res);
+                                console.log("response: ", res);
                             }
                         };
                         $("#zformemail").ajaxSubmit(options);

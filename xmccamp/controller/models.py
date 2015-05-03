@@ -2,12 +2,14 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User)
     group = models.CharField(max_length=255)
     
     def __unicode__(self):
         return self.user.username
+
 
 class Session(models.Model):
     i_session = models.AutoField(primary_key=True)
@@ -92,6 +94,17 @@ class Parent(models.Model):
         return status
 
 
+class Funds(models.Model):
+    funds = models.ForeignKey(Parent)
+    amount = models.CharField(max_length=255)
+    remaining_amount = models.CharField(max_length=255, blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    recieved_time = models.DateTimeField(blank=True, null=True)
+    
+    def __unicode__(self):
+        return self.amount
+        
+        
 class Cadet(models.Model):
     sessions = models.ForeignKey(Session)
     i_cadet = models.AutoField(primary_key=True)

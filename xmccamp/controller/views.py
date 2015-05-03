@@ -149,6 +149,6 @@ def parent_list(request):
 def get_parent_list_json(request):
     column = ['full_name', 'gender', 'email_address', 'cell_phone_number', 
               'business_phone_number', 'home_phone_number']
-    parent_list = list(Parent.objects.values_list(*column))
+    parent_list = list(Parent.objects.filter(user__group='PS').values_list(*column))
     return HttpResponse(json.dumps(parent_list))
 

@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 
 from django.contrib.auth.models import User
 from controller.models import Cadet, Parent, Session
@@ -123,7 +124,7 @@ def parent_registration(request):
     return render(request, 'controller/pages/signup.html', context=form_fields)
 
 
-@login_required
+@csrf_exempt
 def cadet_registration(request):
     msg = dict(status='UNKNOWN', Error=[], count=0)
     try:

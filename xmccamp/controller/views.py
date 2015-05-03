@@ -49,7 +49,7 @@ def dashboard(request):
 
 @login_required
 def cadets_list(request):
-    return render(request, 'controller/pages/tables.html')
+    return render(request, 'controller/pages/cadet_list.html')
 
 
 @login_required
@@ -143,7 +143,7 @@ def cadet_registration(request):
 
 @login_required
 def parent_list(request):
-    return render(request, 'controller/pages/tables.html')
+    return render(request, 'controller/pages/parent_list.html')
 
 
 @login_required

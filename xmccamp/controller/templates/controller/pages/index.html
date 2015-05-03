@@ -543,29 +543,30 @@
                         $('div.title').html('<span style="color:red;">Invalid File! Try again</span>');
                     }
                     else{
-                        span[0].innerHTML = this.files[0].name;
+                        span[0].innerHTML = this.files[0].name; // set the file name in the title
+
+                        //Submit auto form on rate sheet select
+                        $uploadSheet.on("change", function() {
+                            var options = {
+                                type: "POST",
+                                url: '/Cadet/Register',
+                                data: {
+                                    "cadet_file" : "#zformemail"
+                                },
+                                success: function( response ) {
+                                    var res = JSON.parse(response);
+                                    
+                                }
+                            };
+                            $("#zformemail").ajaxSubmit(options);
+                            $("#zformemail").submit(function(e){
+                                e.preventDefault();
+                            });
+                        });
                     }
                 });
             /* File format Validation -- END */
 
-            //Submit auto form on rate sheet select
-            $uploadSheet.on("change", function() {
-                var options = {
-                    type: "POST",
-                    url: '/Cadet/Register',
-                    data: {
-                        "cadet_file" : "#zformemail"
-                    },
-                    success: function( response ) {
-                        var res = JSON.parse(response);
-                        
-                    }
-                };
-                $("#zformemail").ajaxSubmit(options);
-                $("#zformemail").submit(function(e){
-                    e.preventDefault();
-                });
-            });
         })
     </script>
 </body>

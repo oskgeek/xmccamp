@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 
 from django.contrib.auth.models import User
 from controller.models import Cadet, Parent, Session
-from controller.utils import mail, register_cadets
+from controller.utils import mail, register_cadets, handle_uploaded_file
 
 
 def pxlogin(request):
@@ -71,7 +71,7 @@ def parent_send_emails(request):
             mail(parent_obj.email_address,
                 "PX System Parent Registration! Complete your profile.",
                 message_body,
-                '/home/osamarasheed/.virtualenvs/xmccamp/xmccamp/xmccamp/controller/static/controller/img/logo.png')
+                settings.MEDIA_ROOT + 'files_library/logo.png')
             parent_obj.secret_code = secret_code
             parent_obj.save()
         response_dict['status'] = 'OK'
@@ -124,8 +124,9 @@ def parent_registration(request):
 
 @login_required
 def cadet_registration(request):
-    msg = dict(status='UNKNOWN', Error=[])
+    msg = dict(status='UNKNOWN', Error=[], count=0)
     try:
+        handle_uploaded_file(request.FILES['cadet_file'])
         register_cadets(settings.MEDIA_ROOT + 'files_library/xmcamp.xlsx', msg)
         if msg['status'] != 'FAILED':
             msg['status'] = 'OK'

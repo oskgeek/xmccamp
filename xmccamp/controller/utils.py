@@ -2,12 +2,15 @@ import os
 import smtplib
 import pyexcel
 import pyexcel.ext.xlsx
-from email.MIMEMultipart import MIMEMultipart
+from email import Encoders
 from email.MIMEBase import MIMEBase
 from email.MIMEText import MIMEText
-from email import Encoders
+from email.MIMEMultipart import MIMEMultipart
+
+from django.conf import settings
 
 from controller.models import Cadet, Parent, Session
+
 
 gmail_user = "xmcpxstore@gmail.com"
 gmail_pwd = "OurStore"
@@ -110,8 +113,20 @@ def register_cadets(file_path, msg=None):
                             
                         cadet_obj.sessions = session_obj
                         cadet_obj.save()
+                        msg['count']+=1
 
 
+    except Exception as ex:
+        msg['status'] = 'FAILED'
+        msg['Error'].append(repr(ex))
+
+
+def handle_uploaded_file(f, msg):
+    msg = dict(status='UNKNOWN', Error=[]) if not msg else msg
+    try:
+        with open(settings.MEDIA_ROOT + 'files_library/xmcamp.xlsx', 'wb+') as destination:
+            for chunk in f.chunks():
+                destination.write(chunk)
     except Exception as ex:
         msg['status'] = 'FAILED'
         msg['Error'].append(repr(ex))

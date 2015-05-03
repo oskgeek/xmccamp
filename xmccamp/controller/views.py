@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 
 from django.contrib.auth.models import User
 from controller.models import Cadet, Parent, Session
-from controller.utils import mail, register_cadets
+from controller.utils import mail, register_cadets, handle_uploaded_file
 
 
 def pxlogin(request):
@@ -71,7 +71,7 @@ def parent_send_emails(request):
             mail(parent_obj.email_address,
                 "PX System Parent Registration! Complete your profile.",
                 message_body,
-                '/home/osamarasheed/.virtualenvs/xmccamp/xmccamp/xmccamp/controller/static/controller/img/logo.png')
+                settings.MEDIA_ROOT + 'files_library/logo.png')
             parent_obj.secret_code = secret_code
             parent_obj.save()
         response_dict['status'] = 'OK'
@@ -84,52 +84,71 @@ def parent_send_emails(request):
 
 
 def parent_registration(request):
+    form_fields = {}
+    
     if 'code' in request.GET:
         secret_code = str(request.GET['code'])
         try:
             parent_obj = Parent.objects.get(secret_code=secret_code)
-            parent_dict = parent_obj.__dict__
-            return render(request, 'controller/pages/signup.html', context=parent_dict)
+            form_fields = parent_obj.__dict__
         except Parent.DoesNotExist:
             pass
             
-    if 'signup' in request.POST:
-        form_fields = {'i_parent': None, 'full_name': None, 'password': None, 
-            'gender': None, 'email_address': None, 'cell_phone_number': None, 
-            'business_phone_number': None, 'home_phone_number': None }
+        if request.method == 'POST':
+            form_fields = {'i_parent': None, 'full_name': None, 'password': None, 
+                'gender': None, 'email_address': None, 'cell_phone_number': None, 
+                'business_phone_number': None, 'home_phone_number': None }
+                
+            for key in form_fields.iterkeys():
+                form_fields[key] = request.POST.get(key, None)
             
-        for key in form_fields.iterkeys():
-            form_fields[key] = request.POST.get(key, None)
-        
-        try:
-            parent_obj = Parent.objects.get(i_parent=form_fields['i_parent'])
-            parent_obj.full_name = form_fields['form_fields']
-            parent_obj.user.user.set_password(form_fields['password'])
-            parent_obj.gender = form_fields['gender']
-            parent_obj.email_address = form_fields['email_address']
-            parent_obj.cell_phone_number = form_fields['cell_phone_number']
-            parent_obj.business_phone_number = form_fields['business_phone_number']
-            parent_obj.home_phone_number = form_fields['home_phone_number']
-            parent_obj.save()
-            message = 'Successfully, saved your account changes.'
-        except Parent.DoesNotExist:
-            message = 'Sorry, Unable to save your account changes.'
-            
-        form_fields['message'] = message
-        return render(request, 'controller/pages/signup.html', context=form_fields)
+            try:
+                parent_obj = Parent.objects.get(i_parent=form_fields['i_parent'])
+                parent_obj.full_name = form_fields['full_name']
+                parent_obj.user.user.set_password(form_fields['password'])
+                parent_obj.gender = form_fields['gender']
+                parent_obj.email_address = form_fields['email_address']
+                parent_obj.cell_phone_number = form_fields['cell_phone_number']
+                parent_obj.business_phone_number = form_fields['business_phone_number']
+                parent_obj.home_phone_number = form_fields['home_phone_number']
+                parent_obj.save()
+                message = 'Successfully, saved your account changes.'
+            except Parent.DoesNotExist:
+                message = 'Sorry, Unable to save your account changes.'
+            form_fields['message'] = message
     
-    return render(request, 'controller/pages/unauthorized.html')    
+    else:
+        return render(request, 'controller/pages/unauthorized.html')    
+        
+    return render(request, 'controller/pages/signup.html', context=form_fields)
+
 
 @login_required
 def cadet_registration(request):
-    msg = dict(status='UNKNOWN', Error=[])
+    msg = dict(status='UNKNOWN', Error=[], count=0)
     try:
-        register_cadets(settings.MEDIA_ROOT + 'files_library/xmcamp.xlsx', msg)
-        if msg['status'] != 'FAILED':
-            msg['status'] = 'OK'
+        if request.method == 'POST':
+            handle_uploaded_file(request.FILES['cadet_file'])
+            register_cadets(settings.MEDIA_ROOT + 'files_library/xmcamp.xlsx', msg)
+            if msg['status'] != 'FAILED':
+                msg['status'] = 'OK'
     
     except Exception as ex:
         msg['status'] = 'FAILED'
         msg['Error'] = repr(ex)
         
     return HttpResponse(json.dumps(msg))
+
+
+@login_required
+def parent_list(request):
+    return render(request, 'controller/pages/tables.html')
+
+
+@login_required
+def get_parent_list_json(request):
+    column = ['full_name', 'gender', 'email_address', 'cell_phone_number', 
+              'business_phone_number', 'home_phone_number']
+    parent_list = list(Parent.objects.values_list(*column))
+    return HttpResponse(json.dumps(parent_list))
+

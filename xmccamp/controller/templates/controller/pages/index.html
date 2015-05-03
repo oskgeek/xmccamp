@@ -37,6 +37,34 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
+    <style type="text/css" media="screen">
+        .fileUpload {
+          position: relative;
+          overflow: hidden;
+        }
+        div.title {
+            color:#3b5998;
+            font-size:12px;
+            font-family:tahoma, arial, sans-serif;
+            background-color:#f6f7f8;
+            border:solid 1px #d2d2d7;
+            text-align: center;
+            padding: 2px;
+            overflow: hidden;
+        }
+        input.upload {
+            position: absolute;
+            top: 0;
+            right: 0;
+            margin: 0;
+            padding: 0;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0;
+            filter: alpha(opacity=0);
+        }
+    </style>
+
 </head>
 
 <body>
@@ -395,13 +423,20 @@
                                 </div>
                             </div>
                         </div>
-                        <a href="#">
-                            <div class="panel-footer">
-                                <span class="pull-left">View Details</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                <div class="clearfix"></div>
+                        <form id="zformemail" accept-charset="utf-8" enctype="multipart/form-data" style="margin: 0px;">
+                            <div class="fileUpload">
+                                {% csrf_token %}
+                                <input id="id_upload_ratesheet" name="workbook_path" type="file" class="upload">
+                                <div class="title">Choose a file to upload</div>
                             </div>
-                        </a>
+                        </form>
+                            <!-- <a id="uploadfile" href="#">
+                                <div class="panel-footer">
+                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a> -->
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
@@ -488,12 +523,51 @@
 
     <!-- Morris Charts JavaScript -->
     <script src="{% static 'bower_components/raphael/raphael-min.js' %}"></script>
-    <script src="{% static 'bower_components/morrisjs/morris.min.js' %}"></script>
-    <script src="{% static 'js/morris-data.js' %}"></script>
+    <!-- // <script src="{% static 'bower_components/morrisjs/morris.min.js' %}"></script> -->
+    <!-- // <script src="{% static 'js/morris-data.js' %}"></script> -->
 
     <!-- Custom Theme JavaScript -->
     <script src="{% static 'dist/js/sb-admin-2.js' %}"></script>
+    
+    <script src="{% static 'js/jquery.form.js' %}"></script>
 
+    <script>
+        $(function () {
+            /* File format Validation */
+                var $uploadSheet = $("input[name='workbook_path']");
+                var span = document.getElementsByClassName('title');
+                $uploadSheet.change(function(event) {
+                    var ext = $uploadSheet.val().split('.').pop().toLowerCase();
+                    if($.inArray(ext, ['xls','xlsx']) == -1) {
+                        $uploadSheet.replaceWith( $uploadSheet = $uploadSheet.clone( true ) );
+                        $('div.title').html('<span style="color:red;">Invalid File! Try again</span>');
+                    }
+                    else{
+                        span[0].innerHTML = this.files[0].name;
+                    }
+                });
+            /* File format Validation -- END */
+
+            //Submit auto form on rate sheet select
+            $uploadSheet.on("change", function() {
+                var options = {
+                    type: "POST",
+                    url: '/Cadet/Register',
+                    data: {
+                        "cadet_file" : "#zformemail"
+                    },
+                    success: function( response ) {
+                        var res = JSON.parse(response);
+                        
+                    }
+                };
+                $("#zformemail").ajaxSubmit(options);
+                $("#zformemail").submit(function(e){
+                    e.preventDefault();
+                });
+            });
+        })
+    </script>
 </body>
 
 </html>

@@ -129,10 +129,11 @@ def cadet_registration(request):
     msg = dict(status='UNKNOWN', Error=[], count=0)
     try:
         if request.method == 'POST':
-            handle_uploaded_file(request.FILES['cadet_file'])
-            register_cadets(settings.MEDIA_ROOT + 'files_library/xmcamp.xlsx', msg)
+            handle_uploaded_file(request.FILES['workbook_path'], msg)
             if msg['status'] != 'FAILED':
-                msg['status'] = 'OK'
+                register_cadets(settings.MEDIA_ROOT + 'files_library/xmcamp.xlsx', msg)
+                if msg['status'] != 'FAILED':
+                    msg['status'] = 'OK'
     
     except Exception as ex:
         msg['status'] = 'FAILED'

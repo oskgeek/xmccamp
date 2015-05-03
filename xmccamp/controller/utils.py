@@ -1,9 +1,43 @@
+import os
+import smtplib
 import pyexcel
 import pyexcel.ext.xlsx
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEBase import MIMEBase
+from email.MIMEText import MIMEText
+from email import Encoders
 
 from controller.models import Cadet, Parent, Session
 
+gmail_user = "xmcpxstore@gmail.com"
+gmail_pwd = "OurStore"
 
+def mail(to, subject, text, attach):
+   msg = MIMEMultipart()
+
+   msg['From'] = gmail_user
+   msg['To'] = to
+   msg['Subject'] = subject
+
+   msg.attach(MIMEText(text))
+
+   part = MIMEBase('application', 'octet-stream')
+   part.set_payload(open(attach, 'rb').read())
+   Encoders.encode_base64(part)
+   part.add_header('Content-Disposition',
+           'attachment; filename="%s"' % os.path.basename(attach))
+   msg.attach(part)
+
+   mailServer = smtplib.SMTP("smtp.gmail.com", 587)
+   mailServer.ehlo()
+   mailServer.starttls()
+   mailServer.ehlo()
+   mailServer.login(gmail_user, gmail_pwd)
+   mailServer.sendmail(gmail_user, to, msg.as_string())
+   # Should be mailServer.quit(), but that crashes...
+   mailServer.close()
+   
+   
 def register_cadets(file_path, msg=None):
     msg = dict(Status='UNKNOWN', Error=[]) if not msg else msg
     excel_field_mappings = {'Participant':

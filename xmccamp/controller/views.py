@@ -1,3 +1,4 @@
+import uuid
 import json
 
 from django.http import HttpResponse
@@ -7,10 +8,11 @@ from django.contrib.auth.decorators import login_required
 
 from django.contrib.auth.models import User
 from controller.models import Cadet, Parent, Session
+from controller.utils import mail, register_cadets
 
 
 def pxlogin(request):
-    response_dict = {'status': 'FAILED'}
+    response_dict = {'status': 'FAILED', 'Error': []}
     if request.method == 'POST':
         username = request.POST.get('username', None)
         password = request.POST.get('password', None)
@@ -22,10 +24,12 @@ def pxlogin(request):
                 print("User is valid, active and authenticated")
                 login(request, user)
                 if not request.POST.get('remember_me', None):
-                    request.session.set_expiry(0)                
-                return redirect('/home/')
+                    request.session.set_expiry(0)          
+                response_dict['status'] = 'OK'
+                return HttpResponse(json.dumps(response_dict))
         else:
             # the authentication system was unable to verify the username and password
+            response_dict['Error'] = 'Sorry, unable to verify provided credentials, try again!'
             return HttpResponse(json.dumps(response_dict))
     
     return render(request, 'controller/pages/login.html')
@@ -35,18 +39,49 @@ def pxlogin(request):
 def logout_view(request):
     logout(request)
 
+
 @login_required
 def dashboard(request):
     return render(request, 'controller/pages/index.html')
 
+
 @login_required
 def cadets_list(request):
     return render(request, 'controller/pages/tables.html')
+
 
 @login_required
 def get_cadet_list_json(request):
     column = ['full_name', 'age_today', 'gender', 'zip_code', 'city', 'state', 'country']
     cadet_list = list(Cadet.objects.values_list(*column))
     return HttpResponse(json.dumps(cadet_list))
+
+
+@login_required
+def parent_send_emails(request):
+    response_dict = {'status': 'UNKNOWN', 'Error': []}
+    try:
+        domain = request.build_absolute_uri('/')[:-1]  
+        parent_qs = Parent.objects.filter(user__group='PS')
+        for parent_obj in parent_qs:
+            secret_code = str(uuid.uuid4())
+            secret_code_url = "%s/Parent/Register/?code=%s" % (domain, secret_code)
+            message_body = "To complete profile, follow this link: %s ." % secret_code_url
+            mail(parent_obj.email_address,
+                "PX System Parent Registration! Complete your profile.",
+                message_body,
+                '/home/osamarasheed/.virtualenvs/xmccamp/xmccamp/xmccamp/controller/static/controller/img/logo.png')
+        response_dict['status'] = 'OK'
+    
+    except Exception as ex:
+        response_dict['status'] = 'FAILED'
+        response_dict['Error'] = repr(ex)
+        
+    return HttpResponse(json.dumps(response_dict))
+
+
+@login_required
+def parent_registration(request):
+    return render(request, 'controller/pages/tables.html')
     
 

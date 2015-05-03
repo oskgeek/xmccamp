@@ -30,7 +30,12 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-
+    <style type="text/css">
+        .logo-image{
+            text-align: center;
+            padding-bottom: 20px;
+        }
+    </style>
 </head>
 
 <body>
@@ -42,6 +47,9 @@
                         <h3 class="panel-title">Please Sign In</h3>
                     </div>
                     <div class="panel-body">
+                        <div class="logo-image">
+                            <img src='{% static "controller/img/logo.png" %}' alt="Logo" title="Logo" width="138" class="img-rounded">
+                        </div>
                         <form id="zform" method="POST" action="{{ request.get_full_path }}" enctype="multipart/form-data">
                             {% csrf_token %}
                             <fieldset>

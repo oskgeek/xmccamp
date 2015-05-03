@@ -58,7 +58,7 @@
                                 </div>
                                 <!-- Change this to a button or input when using this as a form -->
                                 <!-- <a href="javascript:void(0)" name="Submit" class="btn btn-lg btn-success btn-block">Login</a> -->
-                                <input id="signin" class="btn btn-lg btn-success btn-block ripple-effect" type="submit" name="Submit" alt="sign in" value="Login"/>
+                                <input id="login" class="btn btn-lg btn-success btn-block ripple-effect" type="button" name="Submit" alt="sign in" value="Login"/>
                             </fieldset>
                         </form>
                     </div>
@@ -80,5 +80,22 @@
     <script src="{% static 'dist/js/sb-admin-2.js' %}"></script>
 
 </body>
-
+<script>
+    $(function () {
+        $('#login').click(function(event) {
+            $.post($('#zform').attr('action'), $('#zform').serialize(), function(data, textStatus, xhr) {
+                var data = $.parseJSON(data);
+                if (data.status == 'OK') {
+                    window.location = '/home'
+                }
+                else if (data.status == 'FAILED') {
+                    if ($('.alert-danger').length == 0) {
+                        var html = '<div class="alert alert-danger"><a href="#" class="alert-link">Oops! </a>'+data.Error+'</div>';
+                        $('#zform').parent().prepend(html);
+                    };
+                };
+            });
+        });
+    })
+</script>
 </html>

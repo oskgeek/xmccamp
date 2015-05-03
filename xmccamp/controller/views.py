@@ -84,41 +84,43 @@ def parent_send_emails(request):
 
 
 def parent_registration(request):
+    form_fields = {}
+    
     if 'code' in request.GET:
         secret_code = str(request.GET['code'])
         try:
             parent_obj = Parent.objects.get(secret_code=secret_code)
-            parent_dict = parent_obj.__dict__
-            return render(request, 'controller/pages/signup.html', context=parent_dict)
+            form_fields = parent_obj.__dict__
         except Parent.DoesNotExist:
             pass
             
-    if 'signup' in request.POST:
-        form_fields = {'i_parent': None, 'full_name': None, 'password': None, 
-            'gender': None, 'email_address': None, 'cell_phone_number': None, 
-            'business_phone_number': None, 'home_phone_number': None }
+        if request.method == 'POST':
+            form_fields = {'i_parent': None, 'full_name': None, 'password': None, 
+                'gender': None, 'email_address': None, 'cell_phone_number': None, 
+                'business_phone_number': None, 'home_phone_number': None }
+                
+            for key in form_fields.iterkeys():
+                form_fields[key] = request.POST.get(key, None)
             
-        for key in form_fields.iterkeys():
-            form_fields[key] = request.POST.get(key, None)
-        
-        try:
-            parent_obj = Parent.objects.get(i_parent=form_fields['i_parent'])
-            parent_obj.full_name = form_fields['form_fields']
-            parent_obj.user.user.set_password(form_fields['password'])
-            parent_obj.gender = form_fields['gender']
-            parent_obj.email_address = form_fields['email_address']
-            parent_obj.cell_phone_number = form_fields['cell_phone_number']
-            parent_obj.business_phone_number = form_fields['business_phone_number']
-            parent_obj.home_phone_number = form_fields['home_phone_number']
-            parent_obj.save()
-            message = 'Successfully, saved your account changes.'
-        except Parent.DoesNotExist:
-            message = 'Sorry, Unable to save your account changes.'
-            
-        form_fields['message'] = message
-        return render(request, 'controller/pages/signup.html', context=form_fields)
+            try:
+                parent_obj = Parent.objects.get(i_parent=form_fields['i_parent'])
+                parent_obj.full_name = form_fields['full_name']
+                parent_obj.user.user.set_password(form_fields['password'])
+                parent_obj.gender = form_fields['gender']
+                parent_obj.email_address = form_fields['email_address']
+                parent_obj.cell_phone_number = form_fields['cell_phone_number']
+                parent_obj.business_phone_number = form_fields['business_phone_number']
+                parent_obj.home_phone_number = form_fields['home_phone_number']
+                parent_obj.save()
+                message = 'Successfully, saved your account changes.'
+            except Parent.DoesNotExist:
+                message = 'Sorry, Unable to save your account changes.'
+            form_fields['message'] = message
     
-    return render(request, 'controller/pages/unauthorized.html')    
+    else:
+        return render(request, 'controller/pages/unauthorized.html')    
+        
+    return render(request, 'controller/pages/signup.html', context=form_fields)
 
 @login_required
 def cadet_registration(request):

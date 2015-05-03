@@ -4,7 +4,7 @@ import json
 from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 
@@ -40,6 +40,7 @@ def pxlogin(request):
 @login_required
 def logout_view(request):
     logout(request)
+    return redirect('/')
 
 
 @login_required

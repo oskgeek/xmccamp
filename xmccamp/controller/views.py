@@ -122,17 +122,33 @@ def parent_registration(request):
         
     return render(request, 'controller/pages/signup.html', context=form_fields)
 
+
 @login_required
 def cadet_registration(request):
     msg = dict(status='UNKNOWN', Error=[], count=0)
     try:
-        handle_uploaded_file(request.FILES['cadet_file'])
-        register_cadets(settings.MEDIA_ROOT + 'files_library/xmcamp.xlsx', msg)
-        if msg['status'] != 'FAILED':
-            msg['status'] = 'OK'
+        if request.method == 'POST':
+            handle_uploaded_file(request.FILES['cadet_file'])
+            register_cadets(settings.MEDIA_ROOT + 'files_library/xmcamp.xlsx', msg)
+            if msg['status'] != 'FAILED':
+                msg['status'] = 'OK'
     
     except Exception as ex:
         msg['status'] = 'FAILED'
         msg['Error'] = repr(ex)
         
     return HttpResponse(json.dumps(msg))
+
+
+@login_required
+def parent_list(request):
+    return render(request, 'controller/pages/tables.html')
+
+
+@login_required
+def get_parent_list_json(request):
+    column = ['full_name', 'gender', 'email_address', 'cell_phone_number', 
+              'business_phone_number', 'home_phone_number']
+    parent_list = list(Parent.objects.values_list(*column))
+    return HttpResponse(json.dumps(parent_list))
+

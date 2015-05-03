@@ -22,11 +22,11 @@ class Session(models.Model):
 
     def parse_fields(self, data):
         try:
-            self.name = data['Session name']
-            self.location = data['Session location']
-            self.session_type = data['Session type']
-            self.end_date = data['Session end date']
-            self.start_date = data['Session start date']
+            self.name = data.get('Session name', '')
+            self.location = data.get('Session location', '')
+            self.session_type = data.get('Session type', '')
+            self.end_date = data.get('Session end date', '')
+            self.start_date = data.get('Session start date', '')
 
         except KeyError:
             pass
@@ -41,6 +41,7 @@ class Parent(models.Model):
     cell_phone_number = models.CharField(max_length=255, blank=True, null=True)
     business_phone_number = models.CharField(max_length=255, blank=True, null=True)
     home_phone_number = models.CharField(max_length=255, blank=True, null=True)
+    secret_code = models.CharField(max_length=255, blank=True, null=True)
 
     def __unicode__(self):
         return self.full_name
@@ -50,20 +51,20 @@ class Parent(models.Model):
         try:
             user_profile = UserProfile()
             if level == 'S':
-                full_name = data['Secondary P/G: Name']
-                gender = data['Secondary P/G: Gender']
-                email_address = data['Secondary P/G: Email address']
-                home_phone_number = data['Secondary P/G: Home phone number']
-                cell_phone_number = data['Secondary P/G: Cell phone number']
-                business_phone_number = data['Secondary P/G: Business phone number']
+                full_name = data.get('Secondary P/G: Name', '')
+                gender = data.get('Secondary P/G: Gender', '')
+                email_address = data.get('Secondary P/G: Email address', '')
+                home_phone_number = data.get('Secondary P/G: Home phone number', '')
+                cell_phone_number = data.get('Secondary P/G: Cell phone number', '')
+                business_phone_number = data.get('Secondary P/G: Business phone number', '')
                 user_profile.group = 'PS'
             else:
-                full_name = data['Primary P/G: Name']
-                gender = data['Primary P/G: Gender']
-                email_address = data['Primary P/G: Email address']
-                home_phone_number = data['Primary P/G: Home phone number']
-                cell_phone_number = data['Primary P/G: Cell phone number']
-                business_phone_number = data['Primary P/G: Business phone number']
+                full_name = data.get('Primary P/G: Name', '')
+                gender = data.get('Primary P/G: Gender', '')
+                email_address = data.get('Primary P/G: Email address', '')
+                home_phone_number = data.get('Primary P/G: Home phone number', '')
+                cell_phone_number = data.get('Primary P/G: Cell phone number', '')
+                business_phone_number = data.get('Primary P/G: Business phone number', '')
                 user_profile.group = 'PP'
                 
             self.full_name = full_name
@@ -75,7 +76,7 @@ class Parent(models.Model):
             
             try:
                 print "===============", full_name
-                user = User(username=full_name, password=full_name, email=email_address)
+                user = User.objects.create_user(username=full_name, password=email_address, email=email_address)
                 user.save()
                 user_profile.user = user
                 user_profile.save()
@@ -117,20 +118,20 @@ class Cadet(models.Model):
     def parse_fields(self, data):
         status = True
         try:
-            self.full_name = data['Participant: Name']
-            self.age_today = data['Participant: Age as of today']
-            self.gender = data['Participant: Gender']
-            self.address = data['Participant: Address']
-            self.age_session = data['Participant: Age as of session']
-            self.city = data['Participant: City']
-            self.country = data['Participant: Country']
-            self.dob = data['Participant: Date of birth']
-            self.email_address = data['Participant: Email address']
-            self.contact_number = data['Participant: Home phone number']
-            self.state = data['Participant: State']
-            self.usac_training_program = data['Participant: USAC Training Program']
-            self.zip_code = data['Participant: Zip code']
-            self.goal = data['Participant: Please explain what you would like to have your son or daugher accomplish while at camp?  Explain any special situations or other information the staff should know about your child.']
+            self.full_name = data.get('Participant: Name', '')
+            self.age_today = data.get('Participant: Age as of today', '')
+            self.gender = data.get('Participant: Gender', '')
+            self.address = data.get('Participant: Address', '')
+            self.age_session = data.get('Participant: Age as of session', '')
+            self.city = data.get('Participant: City', '')
+            self.country = data.get('Participant: Country', '')
+            self.dob = data.get('Participant: Date of birth', '')
+            self.email_address = data.get('Participant: Email address', '')
+            self.contact_number = data.get('Participant: Home phone number', '')
+            self.state = data.get('Participant: State', '')
+            self.usac_training_program = data.get('Participant: USAC Training Program', '')
+            self.zip_code = data.get('Participant: Zip code', '')
+            self.goal = data.get('Participant: Please explain what you would like to have your son or daugher accomplish while at camp?  Explain any special situations or other information the staff should know about your child.', '')
             
         except KeyError as ex:
             print ex

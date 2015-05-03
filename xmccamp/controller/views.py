@@ -36,6 +36,10 @@ def pxlogin(request):
 
 
 @login_required
+def pxsignup(request):
+    return render(request, 'controller/pages/signup.html')
+
+@login_required
 def logout_view(request):
     logout(request)
 
@@ -83,5 +87,5 @@ def parent_send_emails(request):
 @login_required
 def parent_registration(request):
     return render(request, 'controller/pages/tables.html')
-    
+
 

@@ -42,7 +42,7 @@ def mail(to, subject, text, attach):
    
    
 def register_cadets(file_path, msg=None):
-    msg = dict(Status='UNKNOWN', Error=[]) if not msg else msg
+    msg = dict(status='UNKNOWN', Error=[]) if not msg else msg
     excel_field_mappings = {'Participant':
         ['Participant: Name', 'Participant: Age as of today', 'Participant: Gender',
          'Participant: Address', 'Participant: Home phone number',
@@ -113,5 +113,5 @@ def register_cadets(file_path, msg=None):
 
 
     except Exception as ex:
-        msg['Status'] = 'FAILED'
+        msg['status'] = 'FAILED'
         msg['Error'].append(repr(ex))

@@ -1,6 +1,7 @@
 import uuid
 import json
 
+from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
@@ -71,6 +72,8 @@ def parent_send_emails(request):
                 "PX System Parent Registration! Complete your profile.",
                 message_body,
                 '/home/osamarasheed/.virtualenvs/xmccamp/xmccamp/xmccamp/controller/static/controller/img/logo.png')
+            parent_obj.secret_code = secret_code
+            parent_obj.save()
         response_dict['status'] = 'OK'
     
     except Exception as ex:
@@ -81,15 +84,52 @@ def parent_send_emails(request):
 
 
 def parent_registration(request):
-    response = None
     if 'code' in request.GET:
-        secret_code = request.GET['code']
+        secret_code = str(request.GET['code'])
         try:
             parent_obj = Parent.objects.get(secret_code=secret_code)
             parent_dict = parent_obj.__dict__
-            response = render(request, 'controller/pages/signup.html', context=parent_dict)
+            return render(request, 'controller/pages/signup.html', context=parent_dict)
         except Parent.DoesNotExist:
-            response = render(request, 'controller/pages/access_denied.html', context=parent_dict)
-    return response    
+            pass
+            
+    if 'signup' in request.POST:
+        form_fields = {'i_parent': None, 'full_name': None, 'password': None, 
+            'gender': None, 'email_address': None, 'cell_phone_number': None, 
+            'business_phone_number': None, 'home_phone_number': None }
+            
+        for key in form_fields.iterkeys():
+            form_fields[key] = request.POST.get(key, None)
+        
+        try:
+            parent_obj = Parent.objects.get(i_parent=form_fields['i_parent'])
+            parent_obj.full_name = form_fields['form_fields']
+            parent_obj.user.user.set_password(form_fields['password'])
+            parent_obj.gender = form_fields['gender']
+            parent_obj.email_address = form_fields['email_address']
+            parent_obj.cell_phone_number = form_fields['cell_phone_number']
+            parent_obj.business_phone_number = form_fields['business_phone_number']
+            parent_obj.home_phone_number = form_fields['home_phone_number']
+            parent_obj.save()
+            message = 'Successfully, saved your account changes.'
+        except Parent.DoesNotExist:
+            message = 'Sorry, Unable to save your account changes.'
+            
+        form_fields['message'] = message
+        return render(request, 'controller/pages/signup.html', context=form_fields)
+    
+    return render(request, 'controller/pages/unauthorized.html')    
 
-
+@login_required
+def cadet_registration(request):
+    msg = dict(status='UNKNOWN', Error=[])
+    try:
+        register_cadets(settings.MEDIA_ROOT + 'files_library/xmcamp.xlsx', msg)
+        if msg['status'] != 'FAILED':
+            msg['status'] = 'OK'
+    
+    except Exception as ex:
+        msg['status'] = 'FAILED'
+        msg['Error'] = repr(ex)
+        
+    return HttpResponse(json.dumps(msg))

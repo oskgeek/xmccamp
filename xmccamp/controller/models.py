@@ -82,7 +82,7 @@ class Parent(models.Model):
                 user_profile.save()
                 self.user = user_profile
                 self.save()
-            except IntegrityError:
+            except (ValueError, IntegrityError) as ex:
                 status = False
         
         except KeyError as ex:

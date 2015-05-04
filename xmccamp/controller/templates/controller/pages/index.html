@@ -152,7 +152,7 @@
                                 </div>
                             </div>
                         </div>
-                        <a id="sendParentsEmail" href="javascript:void(0)">
+                        <a id="sendParentsEmail" href="javascript:void(0)" style="cursor: not-allowed;">
                             <div class="panel-footer">
                                 <span class="pull-left">Send Email</span>
                                 <span class="pull-right"><i class="fa fa-send"></i></span>
@@ -261,6 +261,13 @@
                                     $('#alert-wrapper').html('<div class="alert alert-success alert-dismissable">'+
                                     '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>'+
                                     '<a href="#" class="alert-link">Success! </a>Cadets and Parents are successfully uploaded.</div>');
+
+                                    $('#sendParentsEmail').addClass('send-parent-email').css('cursor', 'pointer');
+                                    $('.send-parent-email').click(function(event) {
+                                        $.get('/Parent/SendEmails', function(data) {
+                                            console.log(data);
+                                        });
+                                    });
                                 }
                                 else if (res.status == 'FAILED') {
                                     $('#alert-wrapper').html('<div class="alert alert-danger alert-dismissable">'+
@@ -277,13 +284,6 @@
                     }
                 });
             /* File format Validation -- END */
-
-            $('#sendParentsEmail').click(function(event) {
-
-                $.get('/Parent/SendEmails', function(data) {
-                    console.log(data);
-                });
-            });
 
             /* Preloader --START */
                 var $loader = $('#pre_loader');

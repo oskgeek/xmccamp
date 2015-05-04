@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'^Cadet/Register/$', 'controller.views.cadet_registration'),
     url(r'^Parent/SendEmails/$', 'controller.views.parent_send_emails'),
     url(r'^Parent/Register/$', 'controller.views.parent_registration'),
+    url(r'^Parent/get_parent_fund_amount/$', 'controller.views.get_parent_fund_amount'),
 ]

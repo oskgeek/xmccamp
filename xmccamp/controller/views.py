@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 
 from django.contrib.auth.models import User
-from controller.models import Cadet, Parent, Session
+from controller.models import Cadet, Parent, Session, Funds
 from controller.utils import mail, register_cadets, handle_uploaded_file
 
 
@@ -46,8 +46,9 @@ def logout_view(request):
 
 @login_required
 def dashboard(request):
-    print dir(request.user)
-    return render(request, 'controller/pages/index.html')
+    context = dict()
+    context['permission'] = request.user.userprofile.group
+    return render(request, 'controller/pages/index.html', context)
 
 
 @login_required
@@ -157,4 +158,11 @@ def get_parent_list_json(request):
               'business_phone_number', 'home_phone_number']
     parent_list = list(Parent.objects.filter(user__group='PP').values_list(*column))
     return HttpResponse(json.dumps(parent_list))
+
+
+@login_required
+def get_parent_fund_amount(request):
+    lookup = {'parent__user__user': request.user, 'is_active': True}
+    fund_str = str(Funds.objects.get(**lookup))
+    return HttpResponse(fund_str)
 

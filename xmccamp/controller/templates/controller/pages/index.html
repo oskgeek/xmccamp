@@ -206,9 +206,95 @@
                     </div>
                 </div> -->
             </div>
+            <div class="row">
+                <div class="col-lg-3 col-md-6">
+                    <form id="zformemail" accept-charset="utf-8" enctype="multipart/form-data" style="margin: 0px;">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-dollar fa-5x"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div>Add Funds for Studets!</div>
+                                        <div class="huge"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="https://xmccamppx.myshopify.com/cart/1556957377:1" target="_blank" title="Add Funds">
+                                <div class="panel-footer">
+                                    <span class="pull-left">Add Funds</span>
+                                    <span class="pull-right"><i class="fa fa-money"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="panel panel-green">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-refresh fa-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div>Update Cadet Funds!</div>
+                                    <div class="huge"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <a id="updateFunds" href="javascript:void(0)">
+                            <div class="panel-footer">
+                                <span class="pull-left">Update Funds</span>
+                                <span class="pull-right"><i class="fa fa-retweet"></i></span>
+                                <div class="clearfix"></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="panel panel-yellow">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-money fa-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div>Account Balance!</div>
+                                    <div id="accBalance" class="huge">0</div>
+                                </div>
+                            </div>
+                        </div>
+                        <a id="getParentFundAmount" href="javascript:void(0)">
+                            <div class="panel-footer">
+                                <span class="pull-left">Check Balance</span>
+                                <span class="pull-right"><i class="fa fa-dollar"></i></span>
+                                <div class="clearfix"></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
         <!-- /#page-wrapper -->
+    </div>
+    {% endif %}
 
+    {% if permission == 'PP' %}
+    <div id="wrapper">
+        <div id="pre_loader">
+            <span id="pre_loader_content">
+                <span>
+                    <img src='{% static "controller/img/preloader.gif" %}' alt="pre-loader">
+                    &nbsp;&nbsp;Please wait..
+                </span>
+            </span>
+        </div>
+        <!-- Navigation -->
+        {% include 'controller/pages/nav.html' %}
+        
+        <!-- /#page-wrapper -->
     </div>
     {% endif %}
 
@@ -265,7 +351,16 @@
                                     $('#sendParentsEmail').addClass('send-parent-email').css('cursor', 'pointer');
                                     $('.send-parent-email').click(function(event) {
                                         $.get('/Parent/SendEmails', function(data) {
-                                            console.log(data);
+                                            if (data.status == 'OK') {
+                                                $('#alert-wrapper').html('<div class="alert alert-success alert-dismissable">'+
+                                                '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>'+
+                                                '<a href="#" class="alert-link">Success! </a>Emails sent successfully.</div>');
+                                            }
+                                            else if (res.status == 'FAILED') {
+                                                $('#alert-wrapper').html('<div class="alert alert-danger alert-dismissable">'+
+                                                '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>'+
+                                                '<a href="#" class="alert-link">Oops! </a>Sorry, Something went wrong.</div>');
+                                            };
                                         });
                                     });
                                 }
@@ -298,6 +393,20 @@
                     $loader.hide();
                 });
             /* Preloader --END */
+
+            $('#updateFunds').click(function(event) {
+                $.get('/Parent/fetch_funds/', function(data) {
+                    console.log(data);
+                });
+            });
+
+            $('#getParentFundAmount').click(function(event) {
+                $.get('Parent/get_parent_fund_amount/', function(data) {
+                    console.log(data);
+                    // $('#accBalance').text(data);
+                });
+            });
+
         })
     </script>
 </body>

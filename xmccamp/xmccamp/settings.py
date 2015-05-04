@@ -60,6 +60,13 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+  # ...
+  'django.core.context_processors.request',
+  # ...
+)
+
 ROOT_URLCONF = 'xmccamp.urls'
 
 WSGI_APPLICATION = 'xmccamp.wsgi.application'

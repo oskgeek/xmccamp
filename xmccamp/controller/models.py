@@ -100,7 +100,7 @@ class Funds(models.Model):
     recieved_time = models.DateTimeField()
 
     def __unicode__(self):
-        return self.amount + self.currency
+        return self.parent.full_name
 
 
 class Cadet(models.Model):

@@ -148,6 +148,7 @@ def get_latest_payments(msg=None):
             if parent_qs.count() > 0:
                 if not order['financial_status'].lower() == 'paid':
                     continue
+                order_name = None
                 remaining_amount = 0.0
                 parent_obj = parent_qs[0]
                 try:
@@ -155,13 +156,14 @@ def get_latest_payments(msg=None):
                     funds_obj = Funds.objects.get(**lookup)
                     funds_obj.is_active = False
                     remaining_amount = funds_obj.remaining_amount
-                    funds_obj.save()
-                    
-                    if funds_obj.name == order['name']:
-                        continue
+                    order_name = funds_obj.name
                 except Funds.DoesNotExist:
                     pass
                     
+                if order_name == order['name']:
+                    continue
+                
+                funds_obj.save()
                 funds_obj = Funds()
                 funds_obj.parent = parent_obj
                 funds_obj.amount = float(order['total_price']) + remaining_amount

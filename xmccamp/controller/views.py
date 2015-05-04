@@ -18,7 +18,7 @@ def pxlogin(request):
     if request.method == 'POST':
         email = request.POST.get('email', None)
         password = request.POST.get('password', None)
-        user = authenticate(email=email, password=password)
+        user = authenticate(username=email, password=password)
 
         if user is not None:
             # the password verified for the user
@@ -113,6 +113,7 @@ def parent_registration(request):
                 parent_obj = Parent.objects.get(i_parent=form_fields['i_parent'])
                 parent_obj.full_name = form_fields['full_name']
                 parent_obj.user.user.set_password(form_fields['password'])
+                parent_obj.user.user.username = form_fields['email_address']
                 parent_obj.user.user.email = form_fields['email_address']
                 parent_obj.user.user.save()
                 parent_obj.gender = form_fields['gender']
@@ -165,13 +166,13 @@ def get_parent_list_json(request):
 
 @login_required
 def get_parent_fund_amount(request):
-    fund_str = "0.00 USD"
+    fund_str = dict(amount="0.00 USD")
     lookup = {'parent__user__user': request.user, 'is_active': True}
     try:
-        fund_str = str(Funds.objects.get(**lookup))
+        fund_str['amount'] = str(Funds.objects.get(**lookup).remaining_amount)
     except Funds.DoesNotExist:
         pass
-    return HttpResponse(fund_str)
+    return HttpResponse(json.dumps(fund_str))
 
 
 @login_required

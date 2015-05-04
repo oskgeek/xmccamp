@@ -9,6 +9,7 @@ from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
 
 from django.conf import settings
+from django.db import transaction
 
 from controller.models import Cadet, Parent, Session, Funds
 
@@ -45,6 +46,7 @@ def mail(to, subject, text, attach):
    mailServer.close()
 
 
+@transaction.non_atomic_requests
 def register_cadets(file_path, msg=None):
     msg = dict(status='UNKNOWN', Error=[]) if not msg else msg
     excel_field_mappings = {'Participant':

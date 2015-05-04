@@ -16,8 +16,6 @@ class Session(models.Model):
     name = models.CharField(max_length=255)
     location = models.CharField(max_length=255)
     session_type = models.CharField(max_length=255)
-    end_date = models.DateTimeField(blank=True, null=True)
-    start_date = models.DateTimeField(blank=True, null=True)
 
     def __unicode__(self):
         return self.name
@@ -27,12 +25,9 @@ class Session(models.Model):
             self.name = data.get('Session name', '')
             self.location = data.get('Session location', '')
             self.session_type = data.get('Session type', '')
-            self.end_date = data.get('Session end date', '')
-            self.start_date = data.get('Session start date', '')
 
-        except KeyError:
-            pass
-
+        except (KeyError, TypeError) as ex:
+            print ex
 
 class Parent(models.Model):
     i_parent = models.AutoField(primary_key=True)
@@ -113,7 +108,6 @@ class Cadet(models.Model):
     i_cadet = models.AutoField(primary_key=True)
     full_name = models.CharField(max_length=255)
     age_today = models.IntegerField(max_length=255)
-    dob = models.DateTimeField(blank=True, null=True)
     gender = models.CharField(max_length=5, blank=True, null=True)
     city = models.CharField(max_length=255, blank=True, null=True)
     state = models.CharField(max_length=255, blank=True, null=True)

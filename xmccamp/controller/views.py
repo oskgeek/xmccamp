@@ -16,9 +16,9 @@ from controller.utils import mail, register_cadets, handle_uploaded_file, get_la
 def pxlogin(request):
     response_dict = {'status': 'FAILED', 'Error': []}
     if request.method == 'POST':
-        username = request.POST.get('username', None)
+        email = request.POST.get('email', None)
         password = request.POST.get('password', None)
-        user = authenticate(username=username, password=password)
+        user = authenticate(email=email, password=password)
 
         if user is not None:
             # the password verified for the user
@@ -113,6 +113,8 @@ def parent_registration(request):
                 parent_obj = Parent.objects.get(i_parent=form_fields['i_parent'])
                 parent_obj.full_name = form_fields['full_name']
                 parent_obj.user.user.set_password(form_fields['password'])
+                parent_obj.user.user.email = form_fields['email_address']
+                parent_obj.user.user.save()
                 parent_obj.gender = form_fields['gender']
                 parent_obj.email_address = form_fields['email_address']
                 parent_obj.cell_phone_number = form_fields['cell_phone_number']
@@ -144,7 +146,7 @@ def cadet_registration(request):
     except Exception as ex:
         msg['status'] = 'FAILED'
         msg['Error'] = repr(ex)
-
+        
     return HttpResponse(json.dumps(msg))
 
 

@@ -6,7 +6,7 @@ from django.db import IntegrityError
 class UserProfile(models.Model):
     user = models.OneToOneField(User)
     group = models.CharField(max_length=255)
-    
+
     def __unicode__(self):
         return self.user.username
 
@@ -68,14 +68,14 @@ class Parent(models.Model):
                 cell_phone_number = data.get('Primary P/G: Cell phone number', '')
                 business_phone_number = data.get('Primary P/G: Business phone number', '')
                 user_profile.group = 'PP'
-                
+
             self.full_name = full_name
             self.gender = gender
             self.email_address = email_address
             self.home_phone_number = home_phone_number
             self.cell_phone_number = cell_phone_number
             self.business_phone_number = business_phone_number
-            
+
             try:
                 print "===============", full_name
                 user = User.objects.create_user(username=full_name, password=email_address, email=email_address)
@@ -86,25 +86,28 @@ class Parent(models.Model):
                 self.save()
             except (ValueError, IntegrityError) as ex:
                 status = False
-        
+
         except KeyError as ex:
             print ex
             status = False
-            
+
         return status
 
 
 class Funds(models.Model):
-    funds = models.ForeignKey(Parent)
+    i_funds = models.AutoField(primary_key=True)
+    parent = models.ForeignKey(Parent)
+    name = models.CharField(max_length=255)
     amount = models.CharField(max_length=255)
+    currency = models.CharField(max_length=255)
     remaining_amount = models.CharField(max_length=255, blank=True, null=True)
     is_active = models.BooleanField(default=True)
     recieved_time = models.DateTimeField(blank=True, null=True)
-    
+
     def __unicode__(self):
-        return self.amount
-        
-        
+        return self.amount + self.currency
+
+
 class Cadet(models.Model):
     sessions = models.ForeignKey(Session)
     i_cadet = models.AutoField(primary_key=True)
@@ -123,7 +126,7 @@ class Cadet(models.Model):
     contact_number = models.IntegerField(max_length=255, blank=True, null=True)
     secondary_parent = models.ForeignKey(Parent, related_name='secondary_parent')
     usac_training_program = models.CharField(max_length=255, blank=True, null=True)
-    goal = models.TextField(blank=True, null=True, verbose_name="Why join XMC Camp?")    
+    goal = models.TextField(blank=True, null=True, verbose_name="Why join XMC Camp?")
 
     def __unicode__(self):
         return self.full_name
@@ -145,14 +148,14 @@ class Cadet(models.Model):
             self.usac_training_program = data.get('Participant: USAC Training Program', '')
             self.zip_code = data.get('Participant: Zip code', '')
             self.goal = data.get('Participant: Please explain what you would like to have your son or daugher accomplish while at camp?  Explain any special situations or other information the staff should know about your child.', '')
-            
+
         except KeyError as ex:
             print ex
             status = False
-        
+
         except IntegrityError:
             status = False
-        
+
         return status
 
 class PXManager(models.Model):

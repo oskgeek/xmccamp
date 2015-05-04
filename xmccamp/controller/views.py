@@ -19,21 +19,22 @@ def pxlogin(request):
         username = request.POST.get('username', None)
         password = request.POST.get('password', None)
         user = authenticate(username=username, password=password)
-        
+
         if user is not None:
             # the password verified for the user
             if user.is_active:
                 print("User is valid, active and authenticated")
                 login(request, user)
                 if not request.POST.get('remember_me', None):
-                    request.session.set_expiry(0)          
+                    request.session.set_expiry(0)
                 response_dict['status'] = 'OK'
+                response_dict['user_id'] = user.pk
                 return HttpResponse(json.dumps(response_dict))
         else:
             # the authentication system was unable to verify the username and password
             response_dict['Error'] = 'Sorry, unable to verify provided credentials, try again!'
             return HttpResponse(json.dumps(response_dict))
-    
+
     return render(request, 'controller/pages/login.html')
 
 
@@ -45,6 +46,7 @@ def logout_view(request):
 
 @login_required
 def dashboard(request):
+    user_id = request.GET.get('user_id', None)
     return render(request, 'controller/pages/index.html')
 
 
@@ -55,7 +57,8 @@ def cadets_list(request):
 
 @login_required
 def get_cadet_list_json(request):
-    column = ['full_name', 'age_today', 'gender', 'zip_code', 'city', 'state', 'country']
+    column = ['full_name', 'primary_parent__full_name', 'age_today', 'gender',
+              'zip_code', 'city', 'state', 'country']
     cadet_list = list(Cadet.objects.values_list(*column))
     return HttpResponse(json.dumps(cadet_list))
 
@@ -64,8 +67,8 @@ def get_cadet_list_json(request):
 def parent_send_emails(request):
     response_dict = {'status': 'UNKNOWN', 'Error': []}
     try:
-        domain = request.build_absolute_uri('/')[:-1]  
-        parent_qs = Parent.objects.filter(user__group='PS')
+        domain = request.build_absolute_uri('/')[:-1]
+        parent_qs = Parent.objects.filter(user__group='PP')
         for parent_obj in parent_qs:
             secret_code = str(uuid.uuid4())
             secret_code_url = "%s/Parent/Register/?code=%s" % (domain, secret_code)
@@ -77,17 +80,17 @@ def parent_send_emails(request):
             parent_obj.secret_code = secret_code
             parent_obj.save()
         response_dict['status'] = 'OK'
-    
+
     except Exception as ex:
         response_dict['status'] = 'FAILED'
         response_dict['Error'] = repr(ex)
-        
+
     return HttpResponse(json.dumps(response_dict))
 
 
 def parent_registration(request):
     form_fields = {}
-    
+
     if 'code' in request.GET:
         secret_code = str(request.GET['code'])
         try:
@@ -95,15 +98,15 @@ def parent_registration(request):
             form_fields = parent_obj.__dict__
         except Parent.DoesNotExist:
             pass
-            
+
         if request.method == 'POST':
-            form_fields = {'i_parent': None, 'full_name': None, 'password': None, 
-                'gender': None, 'email_address': None, 'cell_phone_number': None, 
+            form_fields = {'i_parent': None, 'full_name': None, 'password': None,
+                'gender': None, 'email_address': None, 'cell_phone_number': None,
                 'business_phone_number': None, 'home_phone_number': None }
-                
+
             for key in form_fields.iterkeys():
                 form_fields[key] = request.POST.get(key, None)
-            
+
             try:
                 parent_obj = Parent.objects.get(i_parent=form_fields['i_parent'])
                 parent_obj.full_name = form_fields['full_name']
@@ -118,10 +121,10 @@ def parent_registration(request):
             except Parent.DoesNotExist:
                 message = 'Sorry, Unable to save your account changes.'
             form_fields['message'] = message
-    
+
     else:
-        return render(request, 'controller/pages/unauthorized.html')    
-        
+        return render(request, 'controller/pages/unauthorized.html')
+
     return render(request, 'controller/pages/signup.html', context=form_fields)
 
 
@@ -135,11 +138,11 @@ def cadet_registration(request):
                 register_cadets(settings.MEDIA_ROOT + 'files_library/xmcamp.xlsx', msg)
                 if msg['status'] != 'FAILED':
                     msg['status'] = 'OK'
-    
+
     except Exception as ex:
         msg['status'] = 'FAILED'
         msg['Error'] = repr(ex)
-        
+
     return HttpResponse(json.dumps(msg))
 
 
@@ -150,8 +153,8 @@ def parent_list(request):
 
 @login_required
 def get_parent_list_json(request):
-    column = ['full_name', 'gender', 'email_address', 'cell_phone_number', 
+    column = ['full_name', 'gender', 'email_address', 'cell_phone_number',
               'business_phone_number', 'home_phone_number']
-    parent_list = list(Parent.objects.filter(user__group='PS').values_list(*column))
+    parent_list = list(Parent.objects.filter(user__group='PP').values_list(*column))
     return HttpResponse(json.dumps(parent_list))
 

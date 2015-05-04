@@ -46,7 +46,7 @@ def logout_view(request):
 
 @login_required
 def dashboard(request):
-    user_id = request.GET.get('user_id', None)
+    print dir(request.user)
     return render(request, 'controller/pages/index.html')
 
 

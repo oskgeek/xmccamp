@@ -98,11 +98,11 @@ class Funds(models.Model):
     i_funds = models.AutoField(primary_key=True)
     parent = models.ForeignKey(Parent)
     name = models.CharField(max_length=255)
-    amount = models.CharField(max_length=255)
+    amount = models.FloatField()
     currency = models.CharField(max_length=255)
-    remaining_amount = models.CharField(max_length=255, blank=True, null=True)
+    remaining_amount = models.FloatField()
     is_active = models.BooleanField(default=True)
-    recieved_time = models.DateTimeField(blank=True, null=True)
+    recieved_time = models.DateTimeField()
 
     def __unicode__(self):
         return self.amount + self.currency

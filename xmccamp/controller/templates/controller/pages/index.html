@@ -271,21 +271,10 @@
             /* File format Validation -- END */
 
             $('#sendParentsEmail').click(function(event) {
-                $.ajax({
-                    url: '/Parent/SendEmails',
-                    type: 'GET',
-                    dataType: 'json',
-                })
-                .done(function() {
-                    console.log("success");
-                })
-                .fail(function() {
-                    console.log("error");
-                })
                 
-                // $.get('/Parent/SendEmails/', function(data) {
-                //     console.log(data);
-                // });
+                $.get('/Parent/SendEmails', function(data) {
+                    console.log(data);
+                });
             });
 
             /* Preloader --START */

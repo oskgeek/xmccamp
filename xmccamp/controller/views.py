@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from django.contrib.auth.models import User
 from controller.models import Cadet, Parent, Session, Funds
-from controller.utils import mail, register_cadets, handle_uploaded_file
+from controller.utils import mail, register_cadets, handle_uploaded_file, get_latest_payments
 
 
 def pxlogin(request):
@@ -162,7 +162,26 @@ def get_parent_list_json(request):
 
 @login_required
 def get_parent_fund_amount(request):
+    fund_str = "0.00 USD"
     lookup = {'parent__user__user': request.user, 'is_active': True}
-    fund_str = str(Funds.objects.get(**lookup))
+    try:
+        fund_str = str(Funds.objects.get(**lookup))
+    except Funds.DoesNotExist:
+        pass
     return HttpResponse(fund_str)
 
+
+@login_required
+def fetch_funds(request):
+    msg = dict(status='UNKNOWN', Error=[])
+    try:
+        if request.method == 'GET':
+            get_latest_payments(msg)
+            if msg['status'] != 'FAILED':
+                msg['status'] = 'OK'
+
+    except Exception as ex:
+        msg['status'] = 'FAILED'
+        msg['Error'] = repr(ex)
+
+    return HttpResponse(json.dumps(msg))

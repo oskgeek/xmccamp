@@ -74,6 +74,7 @@ def parent_send_emails(request):
             secret_code = str(uuid.uuid4())
             secret_code_url = "%s/Parent/Register/?code=%s" % (domain, secret_code)
             message_body = "To complete profile, follow this link: %s ." % secret_code_url
+            print "Sending Email to : %s" % parent_obj.full_name
             mail(parent_obj.email_address,
                 "PX System Parent Registration! Complete your profile.",
                 message_body,

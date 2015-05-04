@@ -267,7 +267,7 @@
             /* File format Validation -- END */
 
             $('#sendParentsEmail').click(function(event) {
-                $.get('/Parent/SendEmails/', function(data) {
+                $.get('/Parent/SendEmails', function(data) {
                     console.log(data);
                 });
             });

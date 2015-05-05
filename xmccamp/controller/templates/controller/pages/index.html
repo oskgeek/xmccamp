@@ -85,6 +85,9 @@
             left: 3%;
             top: 32%;
         }
+        .huge {
+          font-size: 20px;
+        }
     </style>
 
 </head>
@@ -233,77 +236,77 @@
             </div>
             <!-- /.row -->
             <div class="row">
-                    <div class="col-lg-3 col-md-6">
-                        <form id="zformemail" accept-charset="utf-8" enctype="multipart/form-data" style="margin: 0px;">
-                            <div class="panel panel-primary">
-                                <div class="panel-heading">
-                                    <div class="row">
-                                        <div class="col-xs-3">
-                                            <i class="fa fa-dollar fa-5x"></i>
-                                        </div>
-                                        <div class="col-xs-9 text-right">
-                                            <div>Add Funds for Cadet!</div>
-                                            <div class="huge"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <a href="https://xmccamppx.myshopify.com/cart/1556957377:1" target="_blank" title="Add Funds">
-                                    <div class="panel-footer">
-                                        <span class="pull-left">Add Funds</span>
-                                        <span class="pull-right"><i class="fa fa-money"></i></span>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                </a>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="panel panel-green">
+                <div class="col-lg-3 col-md-6">
+                    <form id="zformemail" accept-charset="utf-8" enctype="multipart/form-data" style="margin: 0px;">
+                        <div class="panel panel-primary">
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-xs-3">
-                                        <i class="fa fa-refresh fa-5x"></i>
+                                        <i class="fa fa-dollar fa-5x"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div>Update Funds!</div>
+                                        <div>Add Funds for Cadet!</div>
                                         <div class="huge"></div>
                                     </div>
                                 </div>
                             </div>
-                            <a id="updateFunds" href="javascript:void(0)">
+                            <a href="https://xmccamppx.myshopify.com/cart/1556957377:1" target="_blank" title="Add Funds">
                                 <div class="panel-footer">
-                                    <span class="pull-left">Update Funds</span>
-                                    <span class="pull-right"><i class="fa fa-retweet"></i></span>
+                                    <span class="pull-left">Add Funds</span>
+                                    <span class="pull-right"><i class="fa fa-money"></i></span>
                                     <div class="clearfix"></div>
                                 </div>
                             </a>
                         </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="panel panel-yellow">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-xs-3">
-                                        <i class="fa fa-money fa-5x"></i>
-                                    </div>
-                                    <div class="col-xs-9 text-right">
-                                        <div>Account Balance!</div>
-                                        <div id="accBalance" class="huge">0</div>
-                                    </div>
+                    </form>
+                </div>
+                <!-- <div class="col-lg-3 col-md-6">
+                    <div class="panel panel-green">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-refresh fa-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div>Update Funds!</div>
+                                    <div class="huge"></div>
                                 </div>
                             </div>
-                            <a id="getParentFundAmount" href="javascript:void(0)">
-                                <div class="panel-footer">
-                                    <span class="pull-left">Check Balance</span>
-                                    <span class="pull-right"><i class="fa fa-dollar"></i></span>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </a>
                         </div>
+                        <a id="updateFunds" href="javascript:void(0)">
+                            <div class="panel-footer">
+                                <span class="pull-left">Update Funds</span>
+                                <span class="pull-right"><i class="fa fa-retweet"></i></span>
+                                <div class="clearfix"></div>
+                            </div>
+                        </a>
+                    </div>
+                </div> -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="panel panel-green">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-money fa-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div>Account Balance!</div>
+                                    <div id="accBalance" class="huge">0</div>
+                                </div>
+                            </div>
+                        </div>
+                        <a id="getParentFundAmount" href="javascript:void(0)">
+                            <div class="panel-footer">
+                                <span class="pull-left">Check Balance</span>
+                                <span class="pull-right"><i class="fa fa-refresh"></i></span>
+                                <div class="clearfix"></div>
+                            </div>
+                        </a>
                     </div>
                 </div>
-            
             </div>
+            
+        </div>
         <!-- /#page-wrapper -->
     </div>
     {% endif %}
@@ -404,20 +407,20 @@
                 });
             /* Preloader --END */
 
-            $('#updateFunds').click(function(event) {
-                $.get('/Parent/fetch_funds/', function(data) {
-                    console.log(data);
-                });
+            getParentFund ()
+            $('#getParentFundAmount').click(function(event) {
+                getParentFund();
             });
 
-            $('#getParentFundAmount').click(function(event) {
+        })
+        function getParentFund () {
+            $.get('/Parent/fetch_funds/', function(data) {
                 $.get('/Parent/get_parent_fund_amount/', function(data) {
                     var res = JSON.parse(data);
                     $('#accBalance').text(res.amount);
                 });
             });
-
-        })
+        }
     </script>
 </body>
 

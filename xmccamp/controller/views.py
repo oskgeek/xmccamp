@@ -169,7 +169,8 @@ def get_parent_fund_amount(request):
     fund_str = dict(amount="0.00 USD")
     lookup = {'parent__user__user': request.user, 'is_active': True}
     try:
-        fund_str['amount'] = str(Funds.objects.get(**lookup).remaining_amount)
+        fund_obj = Funds.objects.get(**lookup)
+        fund_str['amount'] = str(fund_obj.remaining_amount)+' '+fund_obj.currency
     except Funds.DoesNotExist:
         pass
     return HttpResponse(json.dumps(fund_str))

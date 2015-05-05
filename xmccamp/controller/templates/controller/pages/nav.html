@@ -237,12 +237,14 @@
                 <li>
                     <a href="/home"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                 </li>
+                {% if permission == 'AD' %}
                 <li>
                     <a href="/cadets_list"><i class="fa fa-table fa-fw"></i> Cadet List</a>
                 </li>
                 <li>
                     <a href="/parent_list"><i class="fa fa-table fa-fw"></i> Parent List</a>
                 </li>
+                {% endif %}
             </ul>
         </div>
         <!-- /.sidebar-collapse -->

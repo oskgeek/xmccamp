@@ -1,6 +1,9 @@
+import datetime
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.db import IntegrityError
+from django.core.urlresolvers import reverse
 
 
 class UserProfile(models.Model):
@@ -161,3 +164,28 @@ class PXManager(models.Model):
 
     def __unicode__(self):
         return self.full_name
+
+
+class Product(models.Model):
+    i_product = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255, unique=True)
+    description = models.TextField(blank=True, null=True)
+    cost_per_unit = models.FloatField()
+    
+    def get_absolute_url(self):
+        return reverse('product_list')
+    
+    def __unicode__(self):
+        return self.name    
+        
+        
+class Transaction(models.Model):
+    i_transaction = models.AutoField(primary_key=True)
+    product = models.ForeignKey(Product)
+    cadet = models.ForeignKey(Cadet)
+    total_cost = models.FloatField()
+    quantity = models.IntegerField()
+    created_time = models.DateTimeField(default=datetime.datetime.now)
+    
+    def __unicode__(self):
+        return self.product      

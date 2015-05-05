@@ -7,9 +7,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic.list import ListView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.core.urlresolvers import reverse_lazy
 
 from django.contrib.auth.models import User
-from controller.models import Cadet, Parent, Session, Funds
+from controller.models import Cadet, Parent, Session, Funds, Transaction, Product
 from controller.utils import mail, register_cadets, handle_uploaded_file, get_latest_payments
 
 
@@ -170,7 +173,7 @@ def get_parent_fund_amount(request):
     lookup = {'parent__user__user': request.user, 'is_active': True}
     try:
         fund_obj = Funds.objects.get(**lookup)
-        fund_str['amount'] = str(fund_obj.remaining_amount)+' '+fund_obj.currency
+        fund_str['amount'] = "%s %s" % (str(fund_obj.remaining_amount), fund_obj.currency)
     except Funds.DoesNotExist:
         pass
     return HttpResponse(json.dumps(fund_str))
@@ -190,3 +193,53 @@ def fetch_funds(request):
         msg['Error'] = repr(ex)
 
     return HttpResponse(json.dumps(msg))
+
+
+@login_required
+def get_cadet_purchase_history(request):
+    msg = dict(status='UNKNOWN', Error=[])
+    try:
+        if request.method == 'GET':
+            column = ['product__name', 'quantity', 'quantity', 'created_time']
+            lookup = {'cadet__parent__user__user': request.user}
+            recent_transc_data = list(Transaction.objects.filter(
+                **lookup).order_by('created_time').values_list(*column))
+            msg['data'] = recent_transc_data
+            msg['status'] = 'OK'
+
+    except Exception as ex:
+        msg['status'] = 'FAILED'
+        msg['Error'] = repr(ex)
+
+    return HttpResponse(json.dumps(msg))
+
+
+class ProductList(ListView):
+    model = Product
+    fields = '__all__'
+    template_name = 'controller/pages/product_list.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super(ProductList, self).get_context_data(**kwargs)
+        object_list = list(context['object_list'].values_list())
+        context['object_list'] = json.dumps(object_list)
+        return context
+    
+    
+class ProductCreate(CreateView):
+    model = Product
+    fields = '__all__'
+    template_name = 'controller/pages/product_create_form.html'
+
+
+class ProductUpdate(UpdateView):
+    model = Product
+    fields = '__all__'
+    template_name = 'controller/pages/product_update_form.html'
+
+
+class ProductDelete(DeleteView):
+    model = Product
+    fields = '__all__'
+    success_url = reverse_lazy('product-list')
+

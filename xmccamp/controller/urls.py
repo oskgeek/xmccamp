@@ -1,4 +1,5 @@
 from django.conf.urls import url
+from controller.views import ProductList, ProductCreate, ProductUpdate, ProductDelete
 
 urlpatterns = [
     url(r'^$', 'controller.views.pxlogin'),
@@ -13,4 +14,9 @@ urlpatterns = [
     url(r'^Parent/Register/$', 'controller.views.parent_registration'),
     url(r'^Parent/get_parent_fund_amount/$', 'controller.views.get_parent_fund_amount'),
     url(r'^Parent/fetch_funds/$', 'controller.views.fetch_funds'),
+    url(r'^Parent/get_cadet_purchase_history/$', 'controller.views.get_cadet_purchase_history'),
+    url(r'Canteen/product/$', ProductList.as_view(), name='product_list'),
+    url(r'Canteen/product/create/$', ProductCreate.as_view(), name='product_add'),
+    url(r'Canteen/product/(?P<pk>[0-9]+)/$', ProductUpdate.as_view(), name='product_update'),
+    url(r'Canteen/product/(?P<pk>[0-9]+)/delete/$', ProductDelete.as_view(), name='product_delete'),
 ]

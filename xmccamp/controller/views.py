@@ -259,6 +259,15 @@ def manage_transactions(request):
             items = request.POST.getlist('items', [])
             total_cost = request.POST.getlist('total_cost', 0)
             
+            lookup = {'parent__user__user': request.user, 'is_active': True}
+            try:
+                fund_obj = Funds.objects.get(**lookup)
+                if fund_obj.remaining_amount < total_cost:
+                    raise ValueError
+                
+            except Funds.DoesNotExist:
+                raise ValueError
+            
             tObj = CompleteTransaction()
             tObj.cadet_id = cadet_id
             tObj.total_cost = total_cost
@@ -272,8 +281,6 @@ def manage_transactions(request):
                 sObj.save()
                 tObj.transaction.add(sObj)
                 
-            tObj.save()
-                
             response['status'] = 'OK'
         else:
             context = {}
@@ -282,6 +289,10 @@ def manage_transactions(request):
             context['product_list'] = product_list
             return render(request, 'controller/pages/cart.html', context=context)
 
+    except ValueError:
+        response['status'] = 'FAILED'
+        response['Error'] = 'Sorry, unable to continue due to low credit.'
+        
     except Exception as ex:
         response['status'] = 'FAILED'
         response['Error'] = repr(ex)

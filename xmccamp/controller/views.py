@@ -276,9 +276,11 @@ def manage_transactions(request):
                 
             response['status'] = 'OK'
         else:
-            column = ['i_product' , 'name']
+            context = {}
+            column = ['i_product' , 'name', 'cost_per_unit']
             product_list = list(Product.objects.values_list(*column))
-            return render(request, 'controller/pages/cart.html', context=product_list)
+            context['product_list'] = product_list
+            return render(request, 'controller/pages/cart.html', context=context)
 
     except Exception as ex:
         response['status'] = 'FAILED'

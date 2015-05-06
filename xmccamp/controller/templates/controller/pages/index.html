@@ -535,8 +535,9 @@
 
             $.get('/Parent/get_cadet_purchase_history/', function(res) {
                 var res = $.parseJSON(res);
+
                 if (res.status == 'OK') {
-                    $('#purchaseHistoryTable').parents('.row:first').show();
+                    $('#purchaseHistoryTable').parents('.row:first').removeClass('hidden');
                     $('#purchaseHistoryTable').DataTable({
                         responsive: true,
                         "data": res.data,

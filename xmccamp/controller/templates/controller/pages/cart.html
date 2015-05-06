@@ -70,8 +70,12 @@
                                         <input class="form-control" placeholder="Cadet Id" name="cadet_id" type="text" value="" autofocus>
                                     </div>
                                     <div class="form-group">
-                                        {{ product_list }}
-                                        <input class="form-control" placeholder="Product" name="product" type="text" value="" >
+                                        <select class="form-control" name="product_0">
+                                            <option>Choose Product</option>
+                                            {% for id, product, price in product_list %}
+                                            <option value="{{ id }}" data-price="{{ price }}">{{ product }}</option>
+                                            {% endfor %}
+                                        </select>
                                     </div>
                                     <div class="form-group">
                                         <input class="form-control" placeholder="Quantity" name="quantity" type="number" min="1" value="" >
@@ -83,8 +87,8 @@
                                         <input class="form-control" placeholder="Total" name="total_cost" type="text" value="" >
                                     </div>
                                  <!-- Change this to a button or input when using this as a form -->
-                                    <input id="signup" class="btn btn-success btn-block ripple-effect" type="submit" name="create_product" alt="sign up" value="Submit"/>
-                                    <a href="../" class="btn btn-outline btn-primary btn-block">Cancel</a>
+                                    <input class="btn btn-success btn-block ripple-effect" type="submit" name="" alt="" value="Submit"/>
+                                    <a href="/home" class="btn btn-outline btn-primary btn-block">Cancel</a>
                                 </fieldset>
                             </form>
                         </div>

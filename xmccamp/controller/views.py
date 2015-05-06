@@ -197,21 +197,22 @@ def fetch_funds(request):
 
 @login_required
 def get_cadet_purchase_history(request):
-    msg = dict(status='UNKNOWN', Error=[])
+    response = dict(status='UNKNOWN', Error=[])
     try:
         if request.method == 'GET':
-            column = ['product__name', 'quantity', 'quantity', 'created_time']
-            lookup = {'cadet__parent__user__user': request.user}
+            column = ['product__name', 'quantity', 'total_cost', 'created_time']
+            lookup = {'cadet__primary_parent__user__user': request.user}
             recent_transc_data = list(Transaction.objects.filter(
                 **lookup).order_by('created_time').values_list(*column))
-            msg['data'] = recent_transc_data
-            msg['status'] = 'OK'
+            recent_transc_data = [['osama', 11, 11, '222']]
+            response['status'] = 'OK'
+            response['data'] = recent_transc_data
 
     except Exception as ex:
-        msg['status'] = 'FAILED'
-        msg['Error'] = repr(ex)
+        response['status'] = 'FAILED'
+        response['Error'] = repr(ex)
 
-    return HttpResponse(json.dumps(msg))
+    return HttpResponse(json.dumps(response))
 
 
 class ProductList(ListView):
@@ -222,6 +223,7 @@ class ProductList(ListView):
     def get_context_data(self, **kwargs):
         context = super(ProductList, self).get_context_data(**kwargs)
         object_list = list(context['object_list'].values_list())
+        object_list = [x+('',) for x in object_list]
         context['object_list'] = json.dumps(object_list)
         return context
     

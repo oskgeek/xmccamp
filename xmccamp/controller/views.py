@@ -232,16 +232,22 @@ class ProductCreate(CreateView):
     model = Product
     fields = '__all__'
     template_name = 'controller/pages/product_create_form.html'
+    success_url = '/Canteen/product/'
 
 
 class ProductUpdate(UpdateView):
     model = Product
     fields = '__all__'
     template_name = 'controller/pages/product_update_form.html'
+    success_url = '/Canteen/product/'
 
 
 class ProductDelete(DeleteView):
     model = Product
     fields = '__all__'
-    success_url = reverse_lazy('product-list')
+    success_url = '/Canteen/product/'
+    
+    def get(self, *args, **kwargs):
+        return self.post(*args, **kwargs)
+
 

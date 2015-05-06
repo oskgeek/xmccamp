@@ -202,7 +202,7 @@ def get_cadet_purchase_history(request):
         if request.method == 'GET':
             column = ['product__name', 'quantity', 'total_cost', 'created_time']
             lookup = {'cadet__primary_parent__user__user': request.user}
-            recent_transc_data = list(Transaction.objects.filter(
+            recent_transc_data = list(CompleteTransaction.objects.filter(
                 **lookup).order_by('created_time').values_list(*column))
             response['status'] = 'OK'
             response['data'] = recent_transc_data
@@ -270,8 +270,15 @@ def manage_transactions(request):
                 sObj.quantity = quantity
                 sObj.cost = cost
                 sObj.save()
+                tObj.transaction.add(sObj)
+                
+            tObj.save()
                 
             response['status'] = 'OK'
+        else:
+            column = ['i_product' , 'name']
+            product_list = list(Product.objects.values_list(*column))
+            return render(request, 'controller/pages/cart.html', context=product_list)
 
     except Exception as ex:
         response['status'] = 'FAILED'

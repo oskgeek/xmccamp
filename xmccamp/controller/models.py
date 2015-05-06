@@ -178,14 +178,22 @@ class Product(models.Model):
     def __unicode__(self):
         return self.name    
         
-        
-class Transaction(models.Model):
-    i_transaction = models.AutoField(primary_key=True)
+
+class SubTransaction(models.Model):
     product = models.ForeignKey(Product)
-    cadet = models.ForeignKey(Cadet)
-    total_cost = models.FloatField()
     quantity = models.IntegerField()
+    cost = models.FloatField()
+    
+    def __unicode__(self):
+        return self.product  
+        
+            
+class CompleteTransaction(models.Model):
+    i_transaction = models.AutoField(primary_key=True)
+    cadet = models.ForeignKey(Cadet)
+    transaction = models.ManyToManyField(SubTransaction)
+    total_cost = models.FloatField()
     created_time = models.DateTimeField(default=datetime.datetime.now)
     
     def __unicode__(self):
-        return self.product      
+        return self.cadet      

@@ -12,7 +12,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy
 
 from django.contrib.auth.models import User
-from controller.models import Cadet, Parent, Session, Funds, Transaction, Product
+from controller.models import Cadet, Parent, Session, Funds, CompleteTransaction, Product, SubTransaction
 from controller.utils import mail, register_cadets, handle_uploaded_file, get_latest_payments
 
 
@@ -204,7 +204,6 @@ def get_cadet_purchase_history(request):
             lookup = {'cadet__primary_parent__user__user': request.user}
             recent_transc_data = list(Transaction.objects.filter(
                 **lookup).order_by('created_time').values_list(*column))
-            recent_transc_data = [['osama', 11, 11, '222']]
             response['status'] = 'OK'
             response['data'] = recent_transc_data
 
@@ -251,3 +250,31 @@ class ProductDelete(DeleteView):
         return self.post(*args, **kwargs)
 
 
+@login_required
+def manage_transactions(request):
+    response = dict(status='UNKNOWN', Error=[])
+    try:
+        if request.method == 'POST':
+            cadet_id = request.POST.get('cadet_id', None)
+            items = request.POST.getlist('items', [])
+            total_cost = request.POST.getlist('total_cost', 0)
+            
+            tObj = CompleteTransaction()
+            tObj.cadet_id = cadet_id
+            tObj.total_cost = total_cost
+            tObj.save()
+            
+            for (product_id, quantity, cost) in items:
+                sObj = SubTransaction()
+                sObj.product_id = product_id
+                sObj.quantity = quantity
+                sObj.cost = cost
+                sObj.save()
+                
+            response['status'] = 'OK'
+
+    except Exception as ex:
+        response['status'] = 'FAILED'
+        response['Error'] = repr(ex)
+
+    return HttpResponse(json.dumps(response))

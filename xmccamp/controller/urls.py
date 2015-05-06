@@ -19,5 +19,5 @@ urlpatterns = [
     url(r'Canteen/product/create/$', ProductCreate.as_view(), name='product_add'),
     url(r'Canteen/product/(?P<pk>[0-9]+)/$', ProductUpdate.as_view(), name='product_update'),
     url(r'Canteen/product/(?P<pk>[0-9]+)/delete/$', ProductDelete.as_view(), name='product_delete'),
-    #url(r'Canteen/manage_transactions/$', 'controller.views.manage_transactions'),
+    url(r'Canteen/manage_transactions/$', 'controller.views.manage_transactions'),
 ]

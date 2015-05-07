@@ -37,7 +37,7 @@ class Parent(models.Model):
     user = models.OneToOneField(UserProfile)
     full_name = models.CharField(max_length=255)
     gender = models.CharField(max_length=5, blank=True, null=True)
-    email_address = models.CharField(max_length=255, blank=True, null=True)
+    email_address = models.CharField(max_length=255, unique=True)
     cell_phone_number = models.CharField(max_length=255, blank=True, null=True)
     business_phone_number = models.CharField(max_length=255, blank=True, null=True)
     home_phone_number = models.CharField(max_length=255, blank=True, null=True)
@@ -76,7 +76,7 @@ class Parent(models.Model):
 
             try:
                 print "===============", full_name
-                user = User.objects.create_user(username=full_name, password=email_address, email=email_address)
+                user = User.objects.create_user(username=email_address, password=email_address, email=email_address)
                 user.save()
                 user_profile.user = user
                 user_profile.save()

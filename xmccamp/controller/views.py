@@ -2,6 +2,7 @@ import uuid
 import json
 
 from django.conf import settings
+from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
@@ -251,6 +252,7 @@ class ProductDelete(DeleteView):
 
 
 @login_required
+@transaction.non_atomic_requests
 def manage_transactions(request):
     response = dict(status='UNKNOWN', Error=[])
     try:
@@ -280,6 +282,9 @@ def manage_transactions(request):
                 sObj.cost = cost
                 sObj.save()
                 tObj.transaction.add(sObj)
+                
+            fund_obj.remaining_amount -= total_cost
+            fund_obj.save()
                 
             response['status'] = 'OK'
         else:

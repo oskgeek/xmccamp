@@ -99,8 +99,7 @@
 </head>
 
 <body>
-    <!-- ADMIN BLOCK -->
-    {% if permission == 'AD' %} 
+    
     <div id="wrapper">
         <div id="pre_loader">
             <span id="pre_loader_content">
@@ -112,10 +111,12 @@
         </div>
         
         <!-- Navigation -->
-        {% with context as context %}
+        {% with permission as permission %}
             {% include 'controller/pages/nav.html' %}
         {% endwith %}
         
+        <!-- ADMIN BLOCK -->
+        {% if permission == 'AD' %} 
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
@@ -174,73 +175,12 @@
                         </a>
                     </div>
                 </div>
-                <!-- <div class="col-lg-3 col-md-6">
-                    <div class="panel panel-yellow">
-                        <div class="panel-heading">
-                            <div class="row">
-                                <div class="col-xs-3">
-                                    <i class="fa fa-shopping-cart fa-5x"></i>
-                                </div>
-                                <div class="col-xs-9 text-right">
-                                    <div class="huge">124</div>
-                                    <div>New Orders!</div>
-                                </div>
-                            </div>
-                        </div>
-                        <a href="#">
-                            <div class="panel-footer">
-                                <span class="pull-left">View Details</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                <div class="clearfix"></div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="panel panel-red">
-                        <div class="panel-heading">
-                            <div class="row">
-                                <div class="col-xs-3">
-                                    <i class="fa fa-support fa-5x"></i>
-                                </div>
-                                <div class="col-xs-9 text-right">
-                                    <div class="huge">13</div>
-                                    <div>Support Tickets!</div>
-                                </div>
-                            </div>
-                        </div>
-                        <a href="#">
-                            <div class="panel-footer">
-                                <span class="pull-left">View Details</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                <div class="clearfix"></div>
-                            </div>
-                        </a>
-                    </div>
-                </div> -->
             </div>
         </div>
-        <!-- /#page-wrapper -->
-    </div>
-    {% endif %}
-
-    <!-- PARENT BLOCK -->
-    {% if permission == 'PP' %}
-    <div id="wrapper">
-        <div id="pre_loader">
-            <span id="pre_loader_content">
-                <span>
-                    <img src='{% static "controller/img/preloader.gif" %}' alt="pre-loader">
-                    &nbsp;&nbsp;Please wait..
-                </span>
-            </span>
-        </div>
+        {% endif %}
         
-        <!-- Navigation -->
-        {% with context as context %}
-            {% include 'controller/pages/nav.html' %}
-        {% endwith %}
-
+        <!-- PARENT BLOCK -->
+        {% if permission == 'PP' %}
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
@@ -341,29 +281,11 @@
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
-            
         </div>
-        <!-- /#page-wrapper -->
-    </div>
-    {% endif %}
-    
-    <!-- CANTEEN BLOCK -->
-    {% if permission == 'CT' %}
-    <div id="wrapper">
-        <div id="pre_loader">
-            <span id="pre_loader_content">
-                <span>
-                    <img src='{% static "controller/img/preloader.gif" %}' alt="pre-loader">
-                    &nbsp;&nbsp;Please wait..
-                </span>
-            </span>
-        </div>
-        
-        <!-- Navigation -->
-        {% with context as context %}
-            {% include 'controller/pages/nav.html' %}
-        {% endwith %}
+        {% endif %}
 
+        <!-- CANTEEN BLOCK -->
+        {% if permission == 'CT' %}
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
@@ -444,10 +366,8 @@
                 </div> -->
             </div>
         </div>
-        <!-- /#page-wrapper -->
+        {% endif %}
     </div>
-    {% endif %}
-
     <!-- /#wrapper -->
 
     <!-- jQuery -->

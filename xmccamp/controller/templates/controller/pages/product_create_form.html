@@ -45,7 +45,9 @@
     <div id="wrapper">
 
         <!-- Navigation -->
-        {% include 'controller/pages/nav.html' with context=context %}
+        {% with permission as permission %}
+            {% include 'controller/pages/nav.html' %}
+        {% endwith %}
 
         <div id="page-wrapper">
             <div class="row">

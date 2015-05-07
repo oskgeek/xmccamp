@@ -291,7 +291,10 @@ def manage_transactions(request):
             context = {}
             column = ['i_product' , 'name', 'cost_per_unit']
             product_list = list(Product.objects.values_list(*column))
+            column = ['pk', 'full_name']
+            cadet_list = list(Cadet.objects.values_list(*column))
             context['product_list'] = product_list
+            context['cadet_list'] = cadet_list
             return render(request, 'controller/pages/cart.html', context=context)
 
     except ValueError:

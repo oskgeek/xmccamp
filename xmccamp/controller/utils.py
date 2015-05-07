@@ -135,6 +135,7 @@ def handle_uploaded_file(f, msg):
         msg['Error'].append(repr(ex))
 
 
+@transaction.non_atomic_requests
 def get_latest_payments(msg=None):
     msg = dict(status='UNKNOWN', Error=[]) if not msg else msg
     try:

@@ -2,6 +2,7 @@ import uuid
 import json
 
 from django.conf import settings
+from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
@@ -251,6 +252,7 @@ class ProductDelete(DeleteView):
 
 
 @login_required
+@transaction.non_atomic_requests
 def manage_transactions(request):
     response = dict(status='UNKNOWN', Error=[])
     try:
@@ -258,6 +260,15 @@ def manage_transactions(request):
             cadet_id = request.POST.get('cadet_id', None)
             items = request.POST.getlist('items', [])
             total_cost = request.POST.getlist('total_cost', 0)
+            
+            lookup = {'parent__user__user': request.user, 'is_active': True}
+            try:
+                fund_obj = Funds.objects.get(**lookup)
+                if fund_obj.remaining_amount < total_cost:
+                    raise ValueError
+                
+            except Funds.DoesNotExist:
+                raise ValueError
             
             tObj = CompleteTransaction()
             tObj.cadet_id = cadet_id
@@ -272,7 +283,8 @@ def manage_transactions(request):
                 sObj.save()
                 tObj.transaction.add(sObj)
                 
-            tObj.save()
+            fund_obj.remaining_amount -= total_cost
+            fund_obj.save()
                 
             response['status'] = 'OK'
         else:
@@ -282,6 +294,10 @@ def manage_transactions(request):
             context['product_list'] = product_list
             return render(request, 'controller/pages/cart.html', context=context)
 
+    except ValueError:
+        response['status'] = 'FAILED'
+        response['Error'] = 'Sorry, unable to continue due to low credit.'
+        
     except Exception as ex:
         response['status'] = 'FAILED'
         response['Error'] = repr(ex)

@@ -56,7 +56,7 @@
             </div>
             <!-- /.row -->
             <div class="row">
-                <div class="col-md-4 col-md-offset-4">
+                <div class="col-md-6 col-md-offset-3">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             Please provide following information:
@@ -67,27 +67,40 @@
                             {% csrf_token %}
                                 <fieldset>
                                     <div class="form-group">
-                                        <input class="form-control" placeholder="Cadet Id" name="cadet_id" type="text" value="" autofocus>
+                                        <input class="form-control" placeholder="Cadet Id" name="cadet_id" type="text" value="" autofocus required>
+                                    </div>
+                                    <div class="row product-row">
+                                        <div class="col-md-5">
+                                            <div class="form-group">
+                                                <select class="form-control" name="product-0" required>
+                                                    <option value="">Choose Product</option>
+                                                    {% for id, product, price in product_list %}
+                                                    <option value="{{ id }}" data-price="{{ price }}">{{ product }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <input class="form-control" placeholder="Quantity" name="quantity-0" type="number" min="1" value="" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <input class="form-control" placeholder="Price" name="product_cost-0" type="text" disabled="disabled">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1" style="padding-left: 0; margin-top: 2px;">
+                                            <button id="addNewProduct" type="button" class="btn btn-info btn-circle" title="Add another">
+                                                <i class="fa fa-plus-circle fa-lg"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                     <div class="form-group">
-                                        <select class="form-control" name="product_0">
-                                            <option>Choose Product</option>
-                                            {% for id, product, price in product_list %}
-                                            <option value="{{ id }}" data-price="{{ price }}">{{ product }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <input class="form-control" placeholder="Quantity" name="quantity" type="number" min="1" value="" >
-                                    </div>
-                                    <div class="form-group">
-                                        <input class="form-control" placeholder="Price" name="product_cost" type="text" >
-                                    </div>
-                                    <div class="form-group">
-                                        <input class="form-control" placeholder="Total" name="total_cost" type="text" value="" >
+                                        <input class="form-control" placeholder="Total" name="total_cost" type="text" value="" disabled="disabled">
                                     </div>
                                  <!-- Change this to a button or input when using this as a form -->
-                                    <input class="btn btn-success btn-block ripple-effect" type="submit" name="" alt="" value="Submit"/>
+                                    <input id="submit" class="btn btn-success btn-block ripple-effect" type="submit" name="" alt="submit" value="Submit"/>
                                     <a href="/home" class="btn btn-outline btn-primary btn-block">Cancel</a>
                                 </fieldset>
                             </form>
@@ -123,6 +136,101 @@
     <!-- Custom Script -->
     <script src="{% static 'js/script.js' %}"></script>
 
+    <script type="text/javascript">
+    $(function () {
+        calcProductPriceAndTotal();
+        var n = 1;
+        $('#addNewProduct').click(function(event) {
+            var productRow = $('.product-row:first');
+            
+            $('.product-row:last').after($(productRow).clone()).html();
+            $('.product-row:not(:first)').find('#addNewProduct').parent().remove();
+            $('.product-row:last').find('[name^="product-"]').attr('name', 'product-'+n);
+            $('.product-row:last').find('[name^="quantity-"]').val('').attr('name', 'quantity-'+n);
+            $('.product-row:last').find('[name^="product_cost-"]').val('').attr('name', 'product_cost-'+n);
+            n++;
+            calcProductPriceAndTotal();
+        });
+
+        // $('#submit').click(function(event) {
+        //     $('#zform input[type="text"]').prop('disabled', false)
+        //     $.ajax({
+        //         url: '/Canteen/manage_transactions',
+        //         type: 'POST',
+        //         dataType: 'json',
+        //         data: $('#zform').serialize(),
+        //     })
+        //     .done(function() {
+        //         console.log("success");
+        //     })
+        //     .fail(function() {
+        //         console.log("error");
+        //     })
+        //     .always(function() {
+        //         $('[name^="product_cost"], [name="total_cost"]').prop('disabled', true);
+        //     })
+            
+        // });
+
+        /* Preloader --START */
+            var $loader = $('#pre_loader');
+            
+            $(document).ajaxStart(function () {
+                $loader.show();
+            })
+            .ajaxStop(function () {
+                $loader.hide();
+            })
+            .ajaxError(function() {
+                $loader.hide();
+            });
+        /* Preloader --END */
+    })
+    function calcProductPriceAndTotal (argument) {
+        $('[name^="product-"], [name^="quantity-"]').on('change keyup', function(event) {
+            var totalCost = '';
+            if ($(this).val() == 0) {
+                $(this).val('');
+            }
+            
+            var cost = $(this).parents('.row:first').find('[name^="product-"] option:selected').attr('data-price');
+            var quantity = $(this).parents('.row:first').find('[name^="quantity-"]').val();
+            var price = cost * quantity;
+            price = quantity ? price : cost;
+            if (cost) {
+                $(this).parents('.row:first').find('[name^="product_cost"]').val(parseFloat(price).toFixed(2));
+            }
+            else{
+                console.log('$(this).val()', $(this).val());
+                $(this).parents('.row:first').find('[name^="quantity-"]').val('');
+                $(this).parents('.row:first').find('[name^="product_cost"]').val('');
+            }
+            $('[name^="product_cost"]').each(function(index, el) {
+                var Cost = $(el).val();
+                totalCost = Number(Cost) + Number(totalCost);
+            });
+            $('[name="total_cost"]').val(parseFloat(totalCost).toFixed(2));
+        });
+    };
+    // function getProductPrice () {
+    //     $('[name^="product-"]').change(function(event) {
+    //         var price = '';
+    //         $('[name^="product-"]').each(function(index, el) {
+    //             var productPrice = Number($(el).find('option:selected').attr('data-price'));
+    //             if (!isNaN(productPrice)) {
+    //                 price = Number(price) + Number(productPrice);
+    //             };
+    //         });
+    //         if (price) {
+    //             $('[name="product_cost"]').val(parseFloat(price).toFixed(2));
+    //         }
+    //         else{
+    //             $('[name="product_cost"]').val('');
+    //         }
+
+    //     });
+    // }
+    </script>
 </body>
 
 </html>

@@ -45,7 +45,7 @@
     <div id="wrapper">
 
         <!-- Navigation -->
-        {% include 'controller/pages/nav.html' %}
+        {% include 'controller/pages/nav.html' with context=context %}
 
         <div id="page-wrapper">
             <div class="row">
@@ -67,13 +67,19 @@
                             {% csrf_token %}
                                 <fieldset>
                                     <div class="form-group">
-                                        <input class="form-control" placeholder="Cadet Id" name="cadet_id" type="text" value="" autofocus required>
+                                        <select class="form-control" name="cadet_id" required>
+                                            <option value="">Select Cadet</option>
+                                            {% for id, fullname in cadet_list %}
+                                                <option value="{{ id }}">{{ fullname }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <!-- <input class="form-control" placeholder="Cadet Id"  type="text" value="" autofocus > -->
                                     </div>
                                     <div class="row product-row">
                                         <div class="col-md-5">
                                             <div class="form-group">
                                                 <select class="form-control" name="product-0" required>
-                                                    <option value="">Choose Product</option>
+                                                    <option value="">Select Product</option>
                                                     {% for id, product, price in product_list %}
                                                     <option value="{{ id }}" data-price="{{ price }}">{{ product }}</option>
                                                     {% endfor %}
@@ -138,7 +144,25 @@
 
     <script type="text/javascript">
     $(function () {
+        
+        var products = [];
+        
+        $('[name^="product-"] option').each(function(index, el) {
+            
+            if ($(el).val()) {
+                var product = [];
+            
+                product.push($(el).val());
+                product.push($(el).attr('data-price'));
+                product.push($(el).text());
+                
+                products.push(product);
+            };
+        });
+        console.log(products);
+        
         calcProductPriceAndTotal();
+        
         var n = 1;
         $('#addNewProduct').click(function(event) {
             var productRow = $('.product-row:first');
@@ -169,7 +193,6 @@
         //     .always(function() {
         //         $('[name^="product_cost"], [name="total_cost"]').prop('disabled', true);
         //     })
-            
         // });
 
         /* Preloader --START */
@@ -186,7 +209,7 @@
             });
         /* Preloader --END */
     })
-    function calcProductPriceAndTotal (argument) {
+    function calcProductPriceAndTotal() {
         $('[name^="product-"], [name^="quantity-"]').on('change keyup', function(event) {
             var totalCost = '';
             if ($(this).val() == 0) {
@@ -201,7 +224,6 @@
                 $(this).parents('.row:first').find('[name^="product_cost"]').val(parseFloat(price).toFixed(2));
             }
             else{
-                console.log('$(this).val()', $(this).val());
                 $(this).parents('.row:first').find('[name^="quantity-"]').val('');
                 $(this).parents('.row:first').find('[name^="product_cost"]').val('');
             }

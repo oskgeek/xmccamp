@@ -99,8 +99,8 @@
 </head>
 
 <body>
-
-    {% if permission == 'AD' %}
+    <!-- ADMIN BLOCK -->
+    {% if permission == 'AD' %} 
     <div id="wrapper">
         <div id="pre_loader">
             <span id="pre_loader_content">
@@ -110,8 +110,10 @@
                 </span>
             </span>
         </div>
+        
         <!-- Navigation -->
         {% include 'controller/pages/nav.html' %}
+        
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
@@ -220,6 +222,7 @@
     </div>
     {% endif %}
 
+    <!-- PARENT BLOCK -->
     {% if permission == 'PP' %}
     <div id="wrapper">
         <div id="pre_loader">
@@ -230,8 +233,10 @@
                 </span>
             </span>
         </div>
+        
         <!-- Navigation -->
         {% include 'controller/pages/nav.html' %}
+
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
@@ -338,7 +343,7 @@
     </div>
     {% endif %}
     
-    
+    <!-- CANTEEN BLOCK -->
     {% if permission == 'CT' %}
     <div id="wrapper">
         <div id="pre_loader">
@@ -350,7 +355,8 @@
             </span>
         </div>
         <!-- Navigation -->
-        {% include 'controller/pages/nav.html' %}
+        {% include 'controller/pages/nav.html' with context=context %}
+
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
@@ -430,7 +436,6 @@
                     </div>
                 </div> -->
             </div>
-            
         </div>
         <!-- /#page-wrapper -->
     </div>

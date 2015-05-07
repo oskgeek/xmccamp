@@ -50,7 +50,7 @@ def logout_view(request):
 
 @login_required
 def dashboard(request):
-    context = dict()
+    context = {}
     context['permission'] = request.user.userprofile.group
     return render(request, 'controller/pages/index.html', context)
 

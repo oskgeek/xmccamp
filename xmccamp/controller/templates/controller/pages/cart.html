@@ -147,21 +147,20 @@
     <script type="text/javascript">
     $(function () {
         
-        var products = [];
-        
-        $('[name^="product-"] option').each(function(index, el) {
+        // var products = [];
+        // $('[name^="product-"] option').each(function(index, el) {
             
-            if ($(el).val()) {
-                var product = [];
+        //     if ($(el).val()) {
+        //         var product = [];
             
-                product.push($(el).val());
-                product.push($(el).attr('data-price'));
-                product.push($(el).text());
+        //         product.push($(el).val());
+        //         product.push($(el).attr('data-price'));
+        //         product.push($(el).text());
                 
-                products.push(product);
-            };
-        });
-        console.log(products);
+        //         products.push(product);
+        //     };
+        // });
+        // console.log(products);
         
         calcProductPriceAndTotal();
         
@@ -169,13 +168,26 @@
         $('#addNewProduct').click(function(event) {
             var productRow = $('.product-row:first');
             
-            $('.product-row:last').after($(productRow).clone()).html();
-            $('.product-row:not(:first)').find('#addNewProduct').parent().remove();
-            $('.product-row:last').find('[name^="product-"]').attr('name', 'product-'+n);
-            $('.product-row:last').find('[name^="quantity-"]').val('').attr('name', 'quantity-'+n);
-            $('.product-row:last').find('[name^="product_cost-"]').val('').attr('name', 'product_cost-'+n);
-            n++;
-            calcProductPriceAndTotal();
+            if ($('.product-row:last').find('[name^="product-"]').val()) {
+
+                $('.product-row:last').after($(productRow).clone()).html();
+                $('.product-row:not(:first)').find('#addNewProduct').parent().remove();
+                $('.product-row:last').find('[name^="product-"]').attr('name', 'product-'+n);
+                $('.product-row:last').find('[name^="quantity-"]').val('').attr('name', 'quantity-'+n);
+                $('.product-row:last').find('[name^="product_cost-"]').val('').attr('name', 'product_cost-'+n);
+
+                /* Removing Previous Selected Product on New Product */
+                for (var i = 0; i < n; i++) {
+                    var prevSBC = $('[name="product-'+i+'"]').val();
+                    if (prevSBC != '') {
+                       $('.product-row:last').find('[name^="product-"]').find('option[value="'+prevSBC+'"]').remove();
+                    };
+                };
+                /* Removing Previous Selected Product on New Product. -- END */
+
+                n++;
+                calcProductPriceAndTotal();
+            };
         });
 
         // $('#submit').click(function(event) {
@@ -214,10 +226,12 @@
     function calcProductPriceAndTotal() {
         $('[name^="product-"], [name^="quantity-"]').on('change keyup', function(event) {
             var totalCost = '';
+            var $that = $(this);
+
             if ($(this).val() == 0) {
                 $(this).val('');
             }
-            
+            var value = $(this).parents('.row:first').find('[name^="product-"]').val();
             var cost = $(this).parents('.row:first').find('[name^="product-"] option:selected').attr('data-price');
             var quantity = $(this).parents('.row:first').find('[name^="quantity-"]').val();
             var price = cost * quantity;
@@ -233,6 +247,13 @@
                 var Cost = $(el).val();
                 totalCost = Number(Cost) + Number(totalCost);
             });
+            /* Remove Selected Product from All Dropdown */
+                $('[name^="product-"]').each(function(index, el) {
+                    if (value) {
+                        $(el).not($that).find('option[value="'+value+'"]').remove();
+                    };
+                });
+            /* Remove Selected Product from All Dropdown */
             $('[name="total_cost"]').val(parseFloat(totalCost).toFixed(2));
         });
     };

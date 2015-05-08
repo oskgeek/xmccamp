@@ -96,6 +96,7 @@ def parent_send_emails(request):
 
 def parent_registration(request):
     form_fields = {}
+    form_fields['permission'] = request.user.userprofile.group
 
     if 'code' in request.GET:
         secret_code = str(request.GET['code'])
@@ -201,7 +202,8 @@ def get_cadet_purchase_history(request):
     response = dict(status='UNKNOWN', Error=[])
     try:
         if request.method == 'GET':
-            column = ['product__name', 'quantity', 'total_cost', 'created_time']
+            column = ['transaction__product__name', 'transaction__quantity', 
+                      'transaction__cost', 'created_time']
             lookup = {'cadet__primary_parent__user__user': request.user}
             recent_transc_data = list(CompleteTransaction.objects.filter(
                 **lookup).order_by('created_time').values_list(*column))
@@ -225,6 +227,8 @@ class ProductList(ListView):
         object_list = list(context['object_list'].values_list())
         object_list = [x+('',) for x in object_list]
         context['object_list'] = json.dumps(object_list)
+        context['permission'] = 'CT'
+        
         return context
     
     
@@ -257,17 +261,20 @@ def manage_transactions(request):
     response = dict(status='UNKNOWN', Error=[])
     try:
         if request.method == 'POST':
+            print request.POST
             cadet_id = request.POST.get('cadet_id', None)
             items = request.POST.getlist('items', [])
             total_cost = request.POST.getlist('total_cost', 0)
+            print total_cost
             
-            lookup = {'parent__user__user': request.user, 'is_active': True}
             try:
+                parent = Cadet.objects.get(pk=cadet_id).primary_parent
+                lookup = {'parent': parent, 'is_active': True}
                 fund_obj = Funds.objects.get(**lookup)
                 if fund_obj.remaining_amount < total_cost:
                     raise ValueError
                 
-            except Funds.DoesNotExist:
+            except (Funds.DoesNotExist, Cadet.DoesNotExist):
                 raise ValueError
             
             tObj = CompleteTransaction()
@@ -295,6 +302,7 @@ def manage_transactions(request):
             cadet_list = list(Cadet.objects.values_list(*column))
             context['product_list'] = product_list
             context['cadet_list'] = cadet_list
+            context['permission'] = request.user.userprofile.group
             return render(request, 'controller/pages/cart.html', context=context)
 
     except ValueError:

@@ -107,9 +107,14 @@
                                     <div class="form-group">
                                         <input class="form-control" placeholder="Total" name="total_cost" type="text" value="" disabled="disabled">
                                     </div>
-                                 <!-- Change this to a button or input when using this as a form -->
-                                    <input id="submit" class="btn btn-success btn-block ripple-effect" type="submit" name="" alt="submit" value="Submit"/>
-                                    <a href="/home" class="btn btn-outline btn-primary btn-block">Cancel</a>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <a href="/home" class="btn btn-outline btn-primary btn-block">Cancel</a>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input id="submit" class="btn btn-success btn-block ripple-effect" type="submit" name="" alt="submit" value="Submit"/>
+                                        </div>
+                                    </div>
                                 </fieldset>
                             </form>
                         </div>
@@ -248,11 +253,13 @@
                 totalCost = Number(Cost) + Number(totalCost);
             });
             /* Remove Selected Product from All Dropdown */
-                $('[name^="product-"]').each(function(index, el) {
-                    if (value) {
-                        $(el).not($that).find('option[value="'+value+'"]').remove();
-                    };
-                });
+                if ($(this).attr('name').indexOf("product-") > -1) {
+                    $('[name^="product-"]').each(function(index, el) {
+                        if (value) {
+                            $(el).not($that).find('option[value="'+value+'"]').remove();
+                        };
+                    });
+                };
             /* Remove Selected Product from All Dropdown */
             $('[name="total_cost"]').val(parseFloat(totalCost).toFixed(2));
         });

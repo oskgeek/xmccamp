@@ -1,6 +1,7 @@
 import uuid
 import json
 
+from django import forms
 from django.conf import settings
 from django.db import transaction
 from django.http import HttpResponse
@@ -11,9 +12,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy
+from django.utils.decorators import method_decorator
 
 from django.contrib.auth.models import User
-from controller.models import Cadet, Parent, Session, Funds, CompleteTransaction, Product, SubTransaction, PXStaff
+from controller.models import UserProfile, Cadet, Parent, Session, Funds, CompleteTransaction, Product, SubTransaction, PXStaff
 from controller.utils import mail, register_cadets, handle_uploaded_file, get_latest_payments
 
 
@@ -59,7 +61,9 @@ def dashboard(request):
 
 @login_required
 def cadets_list(request):
-    return render(request, 'controller/pages/cadet_list.html')
+    context = {}
+    context['permission'] = request.user.userprofile.group
+    return render(request, 'controller/pages/cadet_list.html', context)
 
 
 @login_required
@@ -165,15 +169,18 @@ def cadet_registration(request):
 
 @login_required
 def parent_list(request):
-    return render(request, 'controller/pages/parent_list.html')
+    context = {}
+    context['permission'] = request.user.userprofile.group
+    return render(request, 'controller/pages/parent_list.html', context)
 
 
 @login_required
 def get_parent_list_json(request):
-    column = ['full_name', 'gender', 'email_address', 'cell_phone_number',
-              'business_phone_number', 'home_phone_number']
-    parent_list = list(Parent.objects.filter(
-        user__group='PP').values_list(*column))
+    column = ['full_name', 'gender', 'email_address', 
+    'cell_phone_number', 'business_phone_number', 'home_phone_number', 
+    'funds__remaining_amount', 'funds__is_active']
+    parent_list = list(Parent.objects.filter(user__group='PP').values_list(*column))
+    parent_list = [row for row in parent_list if row[7] == True or row[7] is None]
     return HttpResponse(json.dumps(parent_list))
 
 
@@ -239,9 +246,12 @@ class ProductList(ListView):
         object_list = list(context['object_list'].values_list())
         object_list = [x + ('',) for x in object_list]
         context['object_list'] = json.dumps(object_list)
-        context['permission'] = 'CT'
-
+        context['permission'] = self.request.user.userprofile.group
         return context
+        
+    @classmethod
+    def as_view(cls):
+        return login_required(super(ProductList, cls).as_view())        
 
 
 class ProductCreate(CreateView):
@@ -249,6 +259,10 @@ class ProductCreate(CreateView):
     fields = '__all__'
     template_name = 'controller/pages/product_create_form.html'
     success_url = '/Canteen/product/'
+    
+    @classmethod
+    def as_view(cls):
+        return login_required(super(ProductCreate, cls).as_view())    
 
 
 class ProductUpdate(UpdateView):
@@ -256,6 +270,10 @@ class ProductUpdate(UpdateView):
     fields = '__all__'
     template_name = 'controller/pages/product_update_form.html'
     success_url = '/Canteen/product/'
+    
+    @classmethod
+    def as_view(cls):
+        return login_required(super(ProductUpdate, cls).as_view())    
 
 
 class ProductDelete(DeleteView):
@@ -265,6 +283,10 @@ class ProductDelete(DeleteView):
 
     def get(self, *args, **kwargs):
         return self.post(*args, **kwargs)
+        
+    @classmethod
+    def as_view(cls):
+        return login_required(super(ProductDelete, cls).as_view())
 
 
 @login_required
@@ -335,39 +357,97 @@ def manage_transactions(request):
     return HttpResponse(json.dumps(response))
 
 
+
 class PXStaffList(ListView):
     model = PXStaff
     fields = '__all__'
-    template_name = 'controller/pages/product_list.html'
+    template_name = 'controller/pages/accounts/account_list.html'
 
     def get_context_data(self, **kwargs):
         context = super(PXStaffList, self).get_context_data(**kwargs)
-        object_list = list(context['object_list'].values_list())
+        column = ['i_px_manager', 'full_name', 'account_type', 'email_address']
+        object_list = list(context['object_list'].values_list(*column))
         object_list = [x + ('',) for x in object_list]
         context['object_list'] = json.dumps(object_list)
-        context['permission'] = 'AD'
-
+        context['permission'] = self.request.user.userprofile.group
         return context
+        
+    @classmethod
+    def as_view(cls):
+        return login_required(super(PXStaffList, cls).as_view())
 
 
 class PXStaffCreate(CreateView):
     model = PXStaff
-    fields = '__all__'
-    template_name = 'controller/pages/product_create_form.html'
-    success_url = '/Canteen/product/'
+    fields = ['full_name', 'email_address', 'password', 'account_type']
+    template_name = 'controller/pages/accounts/account_create_form.html'
+    success_url = '/Admin/accounts/'
+    
+    def get_context_data(self, **kwargs):
+        context = super(PXStaffCreate, self).get_context_data(**kwargs)
+        context['permission'] = self.request.user.userprofile.group
+        return context
+    
+    def get_form(self, form_class):
+        form = super(PXStaffCreate, self).get_form(form_class)
+        form.fields['password'].widget = forms.PasswordInput()
+        return form
+        
+    def form_valid(self, form):
+        email = form.cleaned_data['email_address']
+        password = form.cleaned_data['password']
+        group = form.cleaned_data['account_type']
+        user = User.objects.create_user(
+                    username=email, password=password, email=email)
+        user.save()
+        user_profile = UserProfile()
+        user_profile.group = group
+        user_profile.user = user
+        user_profile.save()
+        form.instance.user = user_profile
+        return super(PXStaffCreate, self).form_valid(form)
+        
+    @classmethod
+    def as_view(cls):
+        return login_required(super(PXStaffCreate, cls).as_view())
 
 
 class PXStaffUpdate(UpdateView):
     model = PXStaff
-    fields = '__all__'
-    template_name = 'controller/pages/product_update_form.html'
-    success_url = '/Canteen/product/'
+    fields = ['full_name', 'email_address', 'password', 'account_type']
+    template_name = 'controller/pages/accounts/account_update_form.html'
+    success_url = '/Admin/accounts/'
+    
+    def get_context_data(self, **kwargs):
+        context = super(PXStaffUpdate, self).get_context_data(**kwargs)
+        context['permission'] = self.request.user.userprofile.group
+        return context
+        
+    def get_form(self, form_class):
+        form = super(PXStaffUpdate, self).get_form(form_class)
+        form.fields['password'].widget = forms.PasswordInput()
+        form.fields['email_address'].widget.attrs['readonly'] = True
+        return form
+    
+    @classmethod
+    def as_view(cls):
+        return login_required(super(PXStaffUpdate, cls).as_view())
 
 
 class PXStaffDelete(DeleteView):
     model = PXStaff
     fields = '__all__'
-    success_url = '/Canteen/product/'
+    success_url = '/Admin/accounts/'
 
     def get(self, *args, **kwargs):
         return self.post(*args, **kwargs)
+        
+    def get_object(self, queryset=None):
+        obj = super(PXStaffDelete, self).get_object()
+        obj.user.user.delete()
+        obj.user.delete()
+        return obj
+        
+    @classmethod
+    def as_view(cls):
+        return login_required(super(PXStaffDelete, cls).as_view())

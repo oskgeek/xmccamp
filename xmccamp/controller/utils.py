@@ -152,6 +152,8 @@ def get_latest_payments(msg=None):
             if parent_qs.count() > 0:
                 if not order['financial_status'].lower() == 'paid':
                     continue
+                if not order['product_id'] == '692530369' or not order['product_id'] == 692530369:
+                    continue
                 order_name = None
                 funds_obj = None
                 remaining_amount = 0.0

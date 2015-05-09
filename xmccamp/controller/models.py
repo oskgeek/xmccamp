@@ -38,7 +38,7 @@ class Parent(models.Model):
     user = models.OneToOneField(UserProfile)
     full_name = models.CharField(max_length=255)
     gender = models.CharField(max_length=5, blank=True, null=True)
-    email_address = models.CharField(max_length=255, unique=True)
+    email_address = models.EmailField(max_length=255, unique=True)
     cell_phone_number = models.CharField(max_length=255, blank=True, null=True)
     business_phone_number = models.CharField(
         max_length=255, blank=True, null=True)
@@ -125,7 +125,7 @@ class Cadet(models.Model):
     state = models.CharField(max_length=255, blank=True, null=True)
     country = models.CharField(max_length=255, blank=True, null=True)
     zip_code = models.CharField(max_length=255, blank=True, null=True)
-    email_address = models.CharField(max_length=255, blank=True, null=True)
+    email_address = models.EmailField(max_length=255, blank=True, null=True)
     age_session = models.IntegerField(max_length=255, blank=True, null=True)
     primary_parent = models.ForeignKey(Parent, related_name='primary_parent')
     address = models.TextField(blank=True, null=True, verbose_name="Address")
@@ -176,7 +176,7 @@ class PXStaff(models.Model):
     i_px_manager = models.AutoField(primary_key=True)
     user = models.OneToOneField(UserProfile)
     full_name = models.CharField(max_length=255)
-    email_address = models.CharField(max_length=255, blank=True, null=True)
+    email_address = models.EmailField(max_length=255, blank=True, null=True)
     password = models.CharField(max_length=255, blank=True, null=True)
     account_type = models.CharField(max_length=2, choices=ACCOUNT_TYPE)
 

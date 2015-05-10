@@ -103,7 +103,6 @@ def parent_send_emails(request):
 
 def parent_registration(request):
     form_fields = {}
-    form_fields['permission'] = request.user.userprofile.group
 
     if 'code' in request.GET:
         secret_code = str(request.GET['code'])
@@ -225,7 +224,7 @@ def get_cadet_purchase_history(request):
                 **lookup).order_by('created_time').values_list(*column))
 
             for idx, row in enumerate(recent_transc_data):
-                recent_transc_data[idx] = row[:4] + (str(row[4]),)
+                recent_transc_data[idx] = row[:4] + (str(row[4].date()),)
             response['status'] = 'OK'
             response['data'] = recent_transc_data
 

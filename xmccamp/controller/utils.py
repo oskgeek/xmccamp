@@ -93,9 +93,14 @@ def register_cadets(file_path, msg=None):
                 if not any(field_dict.values()):
                     continue
                 print "creating parents"
-                primary_parent_obj = Parent()
-                pp_status = primary_parent_obj.create_parent_by_fields(
-                    field_dict, 'P')
+                try:
+                    lookup = {'email_address': field_dict.get('Primary P/G: Email address', '')}
+                    primary_parent_obj = Parent.objects.get(**lookup)
+                    pp_status = True
+                except Parent.DoesNotExist:
+                    primary_parent_obj = Parent()
+                    pp_status = primary_parent_obj.create_parent_by_fields(
+                        field_dict, 'P')
 
                 secondary_parent_obj = Parent()
                 sp_status = secondary_parent_obj.create_parent_by_fields(

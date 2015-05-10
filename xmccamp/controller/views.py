@@ -218,14 +218,14 @@ def get_cadet_purchase_history(request):
     response = dict(status='UNKNOWN', Error=[])
     try:
         if request.method == 'GET':
-            column = ['transaction__product__name', 'transaction__quantity',
+            column = ['cadet__full_name', 'transaction__product__name', 'transaction__quantity',
                       'transaction__cost', 'created_time']
             lookup = {'cadet__primary_parent__user__user': request.user}
             recent_transc_data = list(CompleteTransaction.objects.filter(
                 **lookup).order_by('created_time').values_list(*column))
 
             for idx, row in enumerate(recent_transc_data):
-                recent_transc_data[idx] = row[:3] + (str(row[3]),)
+                recent_transc_data[idx] = row[:4] + (str(row[4]),)
             response['status'] = 'OK'
             response['data'] = recent_transc_data
 

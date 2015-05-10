@@ -91,6 +91,15 @@ class Parent(models.Model):
                 user_profile.save()
                 self.user = user_profile
                 self.save()
+                
+                funds_obj = Funds()
+                funds_obj.parent = self
+                funds_obj.amount = float(data.get('Initial_Funds', 0))
+                funds_obj.remaining_amount = float(data.get('Initial_Funds', 0))
+                funds_obj.currency = 'USD'
+                funds_obj.name = 'Initial'
+                funds_obj.recieved_time = datetime.datetime.now()
+                funds_obj.save()
             except (ValueError, IntegrityError) as ex:
                 status = False
 

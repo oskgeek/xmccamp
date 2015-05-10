@@ -113,7 +113,7 @@ def register_cadets(file_path, msg=None):
 
                 print "creating cadet profile"
                 try:
-                    lookup = {'full_name': data.get('Participant: Name', '')}
+                    lookup = {'full_name': field_dict.get('Participant: Name', '')}
                     cadet_obj = Cadet.objects.get(**lookup)
                 except Cadet.DoesNotExist:
                     cadet_obj = Cadet()

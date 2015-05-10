@@ -60,7 +60,7 @@ def register_cadets(file_path, msg=None):
                             'Primary P/G':
                             ['Primary P/G: Name', 'Primary P/G: Business phone number',
                              'Primary P/G: Cell phone number', 'Primary P/G: Email address',
-                             'Primary P/G: Gender', 'Primary P/G: Home phone number'],
+                             'Primary P/G: Gender', 'Primary P/G: Home phone number', 'Initial_Funds'],
                             'Secondary P/G':
                             ['Secondary P/G: Business phone number', 'Secondary P/G: Cell phone number',
                              'Secondary P/G: Email address', 'Secondary P/G: Gender',
@@ -112,7 +112,11 @@ def register_cadets(file_path, msg=None):
                 session_obj.save()
 
                 print "creating cadet profile"
-                cadet_obj = Cadet()
+                try:
+                    lookup = {'full_name': data.get('Participant: Name', '')}
+                    cadet_obj = Cadet.objects.get(**lookup)
+                except Cadet.DoesNotExist:
+                    cadet_obj = Cadet()
                 cd_status = cadet_obj.parse_fields(field_dict)
                 if cd_status:
                     if pp_status:

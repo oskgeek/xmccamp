@@ -166,7 +166,7 @@
                                 </div>
                             </div>
                         </div>
-                        <a id="sendParentsEmail" href="javascript:void(0)" style="cursor: not-allowed;">
+                        <a id="sendParentsEmail" href="javascript:void(0)">
                             <div class="panel-footer">
                                 <span class="pull-left">Send Email</span>
                                 <span class="pull-right"><i class="fa fa-send"></i></span>
@@ -426,21 +426,6 @@
                                     $('#alert-wrapper').html('<div class="alert alert-success alert-dismissable">'+
                                     '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>'+
                                     '<a href="#" class="alert-link">Success! </a>Cadets and Parents are successfully uploaded.</div>');
-
-                                    $('#sendParentsEmail').addClass('send-parent-email').css('cursor', 'pointer');
-                                    $('.send-parent-email').click(function(event) {
-                                        $.get('/Parent/SendEmails', function(data) {
-                                            if (data.status == 'OK') {
-                                                $('#alert-wrapper').html('<div class="alert alert-success alert-dismissable">'+
-                                                '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>'+
-                                                '<a href="#" class="alert-link">Success! </a>Emails sent successfully.</div>');
-                                            }
-                                            else if (res.status == 'FAILED') {
-                                                $('#alert-wrapper').html(error_msg('Sorry, Something went wrong.'));
-                                                
-                                            };
-                                        });
-                                    });
                                 }
                                 else if (res.status == 'FAILED') {
                                     $('#alert-wrapper').html(error_msg('Sorry, Something went wrong.'));
@@ -455,7 +440,19 @@
                     }
                 });
             /* File format Validation -- END */
-
+            $('#sendParentsEmail').click(function(event) {
+                $.get('/Parent/SendEmails', function(data) {
+                    if (data.status == 'OK') {
+                        $('#alert-wrapper').html('<div class="alert alert-success alert-dismissable">'+
+                        '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>'+
+                        '<a href="#" class="alert-link">Success! </a>Emails sent successfully.</div>');
+                    }
+                    else if (res.status == 'FAILED') {
+                        $('#alert-wrapper').html(error_msg('Sorry, Something went wrong.'));
+                        
+                    };
+                });
+            });
         })
     </script>
     {% endif %}

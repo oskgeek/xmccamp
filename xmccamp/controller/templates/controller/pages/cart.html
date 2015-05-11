@@ -24,6 +24,9 @@
 
     <!-- DataTables Responsive CSS -->
     <link href="{% static 'bower_components/datatables-responsive/css/dataTables.responsive.css' %}" rel="stylesheet">
+    
+    <!-- Searchable Select -->
+    <link href="{% static 'bower_components/chosen/chosen.min.css' %}" rel="stylesheet">
 
     <!-- Custom CSS -->
     <link href="{% static 'dist/css/sb-admin-2.css' %}" rel="stylesheet">
@@ -37,7 +40,33 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js' %}"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js' %}"></script>
     <![endif]-->
-
+    <style type="text/css">
+        .chosen-container-single .chosen-single div{
+            top: 5px;
+        }
+        .chosen-container-single .chosen-single {
+            padding: 6px 12px;
+            height: 34px;
+            border: 1px solid #D3D3D3;
+            border-radius: 3px;
+            background: none; 
+            background-clip: padding-box;
+            box-shadow: none; 
+            color: #555;
+            text-decoration: none;
+            white-space: nowrap;
+            line-height: 21px;
+        }
+        .chosen-container-active.chosen-with-drop .chosen-single {
+            border: 1px solid #aaa;
+            -moz-border-radius-bottomright: 0;
+            border-bottom-right-radius: 0;
+            -moz-border-radius-bottomleft: 0;
+            border-bottom-left-radius: 0;
+            background-image: none; 
+            box-shadow: 0 1px 0 #fff inset;
+        }
+    </style>
 </head>
 
 <body>
@@ -96,7 +125,7 @@
                                         </div>
                                         <div class="col-md-3">
                                             <div class="form-group">
-                                                <input class="form-control" placeholder="Price" name="product_cost-0" type="text">
+                                                <input class="form-control" placeholder="Price" name="product_cost-0" type="text" disabled="disabled">
                                             </div>
                                         </div>
                                         <div class="col-md-1" style="padding-left: 0; margin-top: 2px;">
@@ -106,7 +135,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <input class="form-control" placeholder="Total" name="total_cost" type="text" value="">
+                                        <input class="form-control" placeholder="Total" name="total_cost" type="text" value="" disabled="disabled">
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
@@ -139,6 +168,8 @@
 
     <!-- Metis Menu Plugin JavaScript -->
     <script src="{% static 'bower_components/metisMenu/dist/metisMenu.min.js' %}"></script>
+    
+    <script src="{% static 'bower_components/chosen/chosen.jquery.min.js' %}"></script>
 
     <!-- DataTables JavaScript -->
     <script src="{% static 'bower_components/datatables/media/js/jquery.dataTables.min.js' %}"></script>
@@ -167,17 +198,22 @@
         //     };
         // });
         // console.log(products);
-        
+        $('[name="cadet_id"]').chosen({allow_single_deselect: true});
+        $('[name^="product-"]').chosen({allow_single_deselect: true});
+
         calcProductPriceAndTotal();
         
         var n = 1;
         $('#addNewProduct').click(function(event) {
             var productRow = $('.product-row:first');
-            
-            if ($('.product-row:last').find('[name^="product-"]').val()) {
+            var isSelected = $('.product-row:last').find('[name^="product-"]').val();
+            var hasProducts = $('.product-row:last').find('[name^="product-"] option').length > 2;
+
+            if (isSelected && hasProducts) {
 
                 $('.product-row:last').after($(productRow).clone()).html();
                 $('.product-row:not(:first)').find('#addNewProduct').parent().remove();
+                $('.product-row:last').find('.chosen-container').remove();
                 $('.product-row:last').find('[name^="product-"]').attr('name', 'product-'+n);
                 $('.product-row:last').find('[name^="quantity-"]').val('').attr('name', 'quantity-'+n);
                 $('.product-row:last').find('[name^="product_cost-"]').val('').attr('name', 'product_cost-'+n);
@@ -193,6 +229,8 @@
 
                 n++;
                 calcProductPriceAndTotal();
+                $('.product-row:last').find('[name^="product-"]').chosen();
+                $('.product-row:last').find('.chosen-container').css('width', '180');
             };
         });
 
@@ -215,7 +253,7 @@
                 };
             })
             .fail(function() {
-                console.log("error");
+                console.error("Server Error!");
             })
             .always(function() {
                 $('[name^="product_cost"], [name="total_cost"]').prop('disabled', true);

@@ -79,7 +79,8 @@ def parent_send_emails(request):
     response_dict = {'status': 'UNKNOWN', 'Error': []}
     try:
         domain = request.build_absolute_uri('/')[:-1]
-        parent_qs = Parent.objects.filter(user__group='PP')
+        lookup = {'user__group': 'PP', 'secret_code__isnull': True}
+        parent_qs = Parent.objects.filter(**lookup)
         for parent_obj in parent_qs:
             secret_code = str(uuid.uuid4())
             secret_code_url = "%s/Parent/Register/?code=%s" % (
@@ -92,7 +93,10 @@ def parent_send_emails(request):
                  settings.MEDIA_ROOT + 'files_library/logo.png')
             parent_obj.secret_code = secret_code
             parent_obj.save()
-        response_dict['status'] = 'OK'
+            response_dict['status'] = 'OK'
+        else:
+            response_dict['status'] = 'FAILED'
+            response_dict['Error'] = 'Sorry, please register a new parent to send registration email.'
 
     except Exception as ex:
         response_dict['status'] = 'FAILED'

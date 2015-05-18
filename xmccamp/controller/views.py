@@ -81,6 +81,11 @@ def parent_send_emails(request):
         domain = request.build_absolute_uri('/')[:-1]
         lookup = {'user__group': 'PP', 'secret_code__isnull': True}
         parent_qs = Parent.objects.filter(**lookup)
+        
+        if len(parent_qs) <= 0:
+            response_dict['status'] = 'FAILED'
+            response_dict['Error'] = 'Sorry, please register a new parent to send registration email.'
+            
         for parent_obj in parent_qs:
             secret_code = str(uuid.uuid4())
             secret_code_url = "%s/Parent/Register/?code=%s" % (
@@ -94,9 +99,6 @@ def parent_send_emails(request):
             parent_obj.secret_code = secret_code
             parent_obj.save()
             response_dict['status'] = 'OK'
-        else:
-            response_dict['status'] = 'FAILED'
-            response_dict['Error'] = 'Sorry, please register a new parent to send registration email.'
 
     except Exception as ex:
         response_dict['status'] = 'FAILED'

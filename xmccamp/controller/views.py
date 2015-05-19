@@ -16,7 +16,7 @@ from django.utils.decorators import method_decorator
 
 from django.contrib.auth.models import User
 from controller.models import UserProfile, Cadet, Parent, Session, Funds, CompleteTransaction, Product, SubTransaction, PXStaff
-from controller.utils import mail, register_cadets, handle_uploaded_file, get_latest_payments
+from controller.utils import mail, register_cadets, handle_uploaded_file, get_latest_payments, send_low_balance_reminder
 
 
 def pxlogin(request):
@@ -336,8 +336,11 @@ def manage_transactions(request):
 
             fund_obj.remaining_amount -= total_cost
             fund_obj.save()
-
-            response['status'] = 'OK'
+            
+            if fund_obj.remaining_amount < 20.0:
+                send_low_balance_reminder(fund_obj.parent.email_address, response)
+                if response['status'] != 'FAILED':
+                    response['status'] = 'OK'
         else:
             context = {}
             column = ['i_product', 'name', 'cost_per_unit']

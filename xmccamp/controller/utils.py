@@ -195,3 +195,15 @@ def get_latest_payments(msg=None):
     except Exception as ex:
         msg['status'] = 'FAILED'
         msg['Error'].append(repr(ex))
+
+
+def send_low_balance_reminder(email_address, msg=None):
+    msg = dict(status='UNKNOWN', Error=[]) if not msg else msg
+    try:
+        subject = "PX System Alert: Low Balance"
+        msg_body = "Greetings, \n\nPlease note that your account balance at PX System is getting low. Please recharge your account balance with us, to avoid any inconvenience for your cadet.\n\nThank You!"
+        attach = settings.MEDIA_ROOT + 'files_library/logo.png'
+        mail(email_address, subject, msg_body, attach)
+    except Exception as ex:
+        msg['status'] = 'FAILED'
+        msg['Error'].append(repr(ex))

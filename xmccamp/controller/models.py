@@ -1,5 +1,6 @@
 import datetime
 
+from jsonfield import JSONField
 from django.db import models
 from django.contrib.auth.models import User
 from django.db import IntegrityError
@@ -224,3 +225,12 @@ class CompleteTransaction(models.Model):
 
     def __unicode__(self):
         return self.cadet
+
+
+class GeneralSettings(models.Model):
+    i_settings = models.AutoField(primary_key=True)
+    configuration = JSONField()
+    
+    def __unicode__(self):
+        return "General Settings"
+    

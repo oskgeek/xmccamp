@@ -11,14 +11,14 @@ from email.MIMEMultipart import MIMEMultipart
 from django.conf import settings
 from django.db import transaction
 
-from controller.models import Cadet, Parent, Session, Funds
-
-
-gmail_user = "xmcpxstore@gmail.com"
-gmail_pwd = "OurStore"
+from controller.models import Cadet, Parent, Session, Funds, GeneralSettings
 
 
 def mail(to, subject, text, attach):
+    global_configuration_obj = GeneralSettings.objects.get()
+    gmail_user = global_configuration_obj.configuration['MailBox']['Email']
+    gmail_pwd = global_configuration_obj.configuration['MailBox']['Password']
+
     msg = MIMEMultipart()
 
     msg['From'] = gmail_user

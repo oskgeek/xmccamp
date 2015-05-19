@@ -17,9 +17,6 @@ from controller.models import Cadet, Parent, Session, Funds
 gmail_user = "xmcpxstore@gmail.com"
 gmail_pwd = "OurStore"
 
-gmail_user = "bitswits.quickbook1@gmail.com"
-gmail_pwd = "nthdive1234"
-
 
 def mail(to, subject, text, attach):
     msg = MIMEMultipart()

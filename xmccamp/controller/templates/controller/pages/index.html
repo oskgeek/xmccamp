@@ -375,7 +375,6 @@
             $('#sendParentsEmail').click(function(event) {
                 $.get('/Parent/SendEmails', function(res) {
                     var res = $.parseJSON(res);
-                    console.log(res.status);
                     if (res) {
 
                         if (res.status == 'OK') {

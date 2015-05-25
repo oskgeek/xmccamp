@@ -110,7 +110,7 @@
         {% endwith %}
         
         <!-- ADMIN BLOCK -->
-        {% if permission == 'PP' %} 
+        {% if permission == 'AD' %} 
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
@@ -174,7 +174,7 @@
         {% endif %}
         
         <!-- PARENT BLOCK -->
-        {% if permission == 'AD' %}
+        {% if permission == 'PP' %}
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
@@ -396,7 +396,7 @@
     </script>
     {% endif %}
     
-    {% if permission == 'AD' %}
+    {% if permission == 'PP' %}
     <script type="text/javascript">
         $(function () {
 

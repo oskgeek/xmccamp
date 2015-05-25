@@ -248,8 +248,9 @@ class ProductList(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductList, self).get_context_data(**kwargs)
-        object_list = list(context['object_list'].values_list())
-        object_list = [x + ('',) for x in object_list]
+        columns = ['pk', 'name', 'description', 'cost_per_unit', 'blank']
+        object_list = list(context['object_list'].extra(select={'blank': "null"}).values_list(*columns))
+        object_list = [[str(y) for y in x] for x in object_list]        
         context['object_list'] = json.dumps(object_list)
         context['permission'] = self.request.user.userprofile.group
         return context

@@ -7,6 +7,7 @@ from email import Encoders
 from email.MIMEBase import MIMEBase
 from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
+from email.MIMEImage import MIMEImage
 
 from django.conf import settings
 from django.db import transaction
@@ -14,7 +15,7 @@ from django.db import transaction
 from controller.models import Cadet, Parent, Session, Funds, GeneralSettings
 
 
-def mail(to, subject, text, attach):
+def mail(to, subject, text, attach=None):
     global_configuration_obj = GeneralSettings.objects.get()
     gmail_user = global_configuration_obj.configuration['MailBox']['Email']
     gmail_pwd = global_configuration_obj.configuration['MailBox']['Password']
@@ -24,15 +25,23 @@ def mail(to, subject, text, attach):
     msg['From'] = gmail_user
     msg['To'] = to
     msg['Subject'] = subject
+    
+    msg.attach(MIMEText(text, 'html'))    
+    
+    #logo part
+    fp = open(settings.MEDIA_ROOT + 'files_library/logo.png', 'rb')
+    msgImage = MIMEImage(fp.read())
+    fp.close()
+    msgImage.add_header('Content-ID', '<logo>')
+    msg.attach(msgImage)
 
-    msg.attach(MIMEText(text))
-
-    part = MIMEBase('application', 'octet-stream')
-    part.set_payload(open(attach, 'rb').read())
-    Encoders.encode_base64(part)
-    part.add_header('Content-Disposition',
-                    'attachment; filename="%s"' % os.path.basename(attach))
-    msg.attach(part)
+    if attach:
+        part = MIMEBase('application', 'octet-stream')
+        part.set_payload(open(attach, 'rb').read())
+        Encoders.encode_base64(part)
+        part.add_header('Content-Disposition',
+                        'attachment; filename="%s"' % os.path.basename(attach))
+        msg.attach(part)
 
     mailServer = smtplib.SMTP("smtp.gmail.com", 587)
     mailServer.ehlo()
@@ -196,14 +205,3 @@ def get_latest_payments(msg=None):
         msg['status'] = 'FAILED'
         msg['Error'].append(repr(ex))
 
-
-def send_low_balance_reminder(email_address, msg=None):
-    msg = dict(status='UNKNOWN', Error=[]) if not msg else msg
-    try:
-        subject = "PX System Alert: Low Balance"
-        msg_body = "Greetings, \n\nPlease note that your account balance at PX System is getting low. Please recharge your account balance with us, to avoid any inconvenience for your cadet.\n\nThank You!"
-        attach = settings.MEDIA_ROOT + 'files_library/logo.png'
-        mail(email_address, subject, msg_body, attach)
-    except Exception as ex:
-        msg['status'] = 'FAILED'
-        msg['Error'].append(repr(ex))

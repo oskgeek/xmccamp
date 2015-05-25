@@ -1,5 +1,6 @@
 import uuid
 import json
+import datetime
 
 from django import forms
 from django.conf import settings
@@ -13,10 +14,11 @@ from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy
 from django.utils.decorators import method_decorator
+from django.template.loader import render_to_string
 
 from django.contrib.auth.models import User
 from controller.models import UserProfile, Cadet, Parent, Session, Funds, CompleteTransaction, Product, SubTransaction, PXStaff
-from controller.utils import mail, register_cadets, handle_uploaded_file, get_latest_payments, send_low_balance_reminder
+from controller.utils import mail, register_cadets, handle_uploaded_file, get_latest_payments
 
 
 def pxlogin(request):
@@ -90,12 +92,11 @@ def parent_send_emails(request):
             secret_code = str(uuid.uuid4())
             secret_code_url = "%s/Parent/Register/?code=%s" % (
                 domain, secret_code)
-            message_body = "To complete profile, follow this link: %s ." % secret_code_url
+            message_body = render_to_string('controller/pages/parent_reg_email_template.html', {'url': secret_code_url })  
             print "Sending Email to : %s" % parent_obj.full_name
             mail(parent_obj.email_address,
-                 "PX System Parent Registration! Complete your profile.",
-                 message_body,
-                 settings.MEDIA_ROOT + 'files_library/logo.png')
+                 "Welcome to XMC Online Canteen Management!",
+                 message_body)
             parent_obj.secret_code = secret_code
             parent_obj.save()
             response_dict['status'] = 'OK'
@@ -339,9 +340,12 @@ def manage_transactions(request):
             fund_obj.save()
             
             if fund_obj.remaining_amount < 20.0:
-                send_low_balance_reminder(fund_obj.parent.email_address, response)
-                if response['status'] != 'FAILED':
-                    response['status'] = 'OK'
+                url = "%s/home/" % request.build_absolute_uri('/')[:-1]
+                subject = "Alert: XMC Canteen Low Balance!"
+                message_body = render_to_string('controller/pages/parent_low_balance_email_template.html', {'url': url, 'amount': fund_obj.remaining_amount, 'datetime': str(datetime.datetime.now()) })
+                mail(fund_obj.parent.email_address, subject, message_body.encode('UTF8'))
+            
+            response['status'] = 'OK'
         else:
             context = {}
             column = ['i_product', 'name', 'cost_per_unit']

@@ -182,11 +182,13 @@ def parent_list(request):
 
 @login_required
 def get_parent_list_json(request):
-    column = ['full_name', 'gender', 'email_address', 
+    column = ['pk', 'full_name', 'gender', 'email_address', 
     'cell_phone_number', 'business_phone_number', 'home_phone_number', 
-    'funds__remaining_amount', 'funds__is_active']
+    'funds__remaining_amount', 'funds__is_active', 'pk']
     parent_list = list(Parent.objects.filter(user__group='PP').values_list(*column))
-    parent_list = [row for row in parent_list if row[7] == True or row[7] is None]
+    parent_list = [list(row) for row in parent_list if row[8] == True or row[8] is None]
+    for row in parent_list:
+        row.pop(8)
     return HttpResponse(json.dumps(parent_list))
 
 

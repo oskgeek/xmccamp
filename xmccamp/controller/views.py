@@ -15,6 +15,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.template.loader import render_to_string
+from django.contrib import messages
 
 from django.contrib.auth.models import User
 from controller.models import UserProfile, Cadet, Parent, Session, Funds, CompleteTransaction, Product, SubTransaction, PXStaff
@@ -70,11 +71,51 @@ def cadets_list(request):
 
 @login_required
 def get_cadet_list_json(request):
-    column = ['full_name', 'primary_parent__full_name', 'age_today', 'gender',
-              'zip_code', 'city', 'state', 'country']
+    column = ['pk', 'full_name', 'primary_parent__full_name', 'age_today', 'gender', 'email_address',
+              'zip_code', 'city', 'state', 'country', 'primary_parent_id']
     cadet_list = list(Cadet.objects.values_list(*column))
     return HttpResponse(json.dumps(cadet_list))
 
+   
+class CadetUpdate(UpdateView):
+    model = Cadet
+    fields = ['full_name', 'age_today', 'gender', 'email_address',
+              'zip_code', 'city', 'state', 'country']
+    template_name = 'controller/pages/cadets/cadet_update_form.html'
+    success_url = '/cadets_list/'
+    
+    def get_context_data(self, **kwargs):
+        context = super(CadetUpdate, self).get_context_data(**kwargs)
+        context['permission'] = self.request.user.userprofile.group
+        return context
+        
+    def form_valid(self, form):
+        messages.success(self.request, "Successfully updated cadet's details.")
+        return super(UpdateView, self).form_valid(form)
+            
+    @classmethod
+    def as_view(cls):
+        return login_required(super(CadetUpdate, cls).as_view())
+
+@login_required
+def add_cadet_reward(request, pk):
+    redirect_to = '/cadets_list/'
+    try:
+        lookup = {'parent_id': pk, 'is_active': True}
+        fund_obj = Funds.objects.get(**lookup)
+        fund_obj.remaining_amount += float(10)
+        fund_obj.save()
+    except Funds.DoesNotExist:
+        funds_obj = Funds()
+        funds_obj.parent_id = pk
+        funds_obj.amount = float(10)
+        funds_obj.remaining_amount = float(10)
+        funds_obj.currency = 'USD'
+        funds_obj.name = 'Manual'
+        funds_obj.recieved_time = datetime.datetime.now()
+        funds_obj.save()
+    messages.success(request, "Successfully added $10 reward in cadet's account.")
+    return redirect(redirect_to)
 
 @login_required
 def parent_send_emails(request):
@@ -190,6 +231,54 @@ def get_parent_list_json(request):
     for row in parent_list:
         row.pop(8)
     return HttpResponse(json.dumps(parent_list))
+    
+    
+class ParentUpdate(UpdateView):
+    model = Parent
+    fields = ['full_name', 'gender', 'email_address', 'cell_phone_number', 
+              'business_phone_number', 'home_phone_number']
+    template_name = 'controller/pages/parents/parent_update_form.html'
+    success_url = '/parent_list/'
+    
+    def get_context_data(self, **kwargs):
+        context = super(ParentUpdate, self).get_context_data(**kwargs)
+        context['permission'] = self.request.user.userprofile.group
+        return context
+        
+    def get_form(self, form_class):
+        form = super(UpdateView, self).get_form(form_class)
+        remaining_amount = 0
+        try:
+            fund_obj = form.instance.funds_set.get(is_active=True)
+            remaining_amount = fund_obj.remaining_amount
+        except Funds.DoesNotExist:
+            pass            
+        form.fields['Balance'] = forms.CharField(initial=remaining_amount)
+        return form
+        
+    def form_valid(self, form):
+        response = super(UpdateView, self).form_valid(form)
+        remaining_amount = form.cleaned_data['Balance']
+        try:
+            fund_obj = form.instance.funds_set.get(is_active=True)
+            fund_obj.remaining_amount = remaining_amount
+            fund_obj.save()
+        except Funds.DoesNotExist:
+            funds_obj = Funds()
+            funds_obj.parent = form.instance
+            funds_obj.amount = remaining_amount
+            funds_obj.remaining_amount = remaining_amount
+            funds_obj.currency = 'USD'
+            funds_obj.name = 'Manual'
+            funds_obj.recieved_time = datetime.datetime.now()
+            funds_obj.save()
+        messages.success(self.request, "Successfully updated parent's details.")        
+        return response
+    
+    @classmethod
+    def as_view(cls):
+        return login_required(super(ParentUpdate, cls).as_view())
+
 
 
 @login_required

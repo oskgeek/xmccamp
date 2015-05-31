@@ -35,10 +35,11 @@ class Session(models.Model):
 
 
 class Parent(models.Model):
+    GENDER_TYPE = (('MALE', 'MALE'), ('FEMALE', 'FEMALE'))
     i_parent = models.AutoField(primary_key=True)
     user = models.OneToOneField(UserProfile)
     full_name = models.CharField(max_length=255)
-    gender = models.CharField(max_length=5, blank=True, null=True)
+    gender = models.CharField(max_length=6, blank=True, null=True, choices=GENDER_TYPE)
     email_address = models.EmailField(max_length=255, unique=True)
     cell_phone_number = models.CharField(max_length=255, blank=True, null=True)
     business_phone_number = models.CharField(
@@ -126,11 +127,12 @@ class Funds(models.Model):
 
 
 class Cadet(models.Model):
+    GENDER_TYPE = (('MALE', 'MALE'), ('FEMALE', 'FEMALE'))
     sessions = models.ForeignKey(Session)
     i_cadet = models.AutoField(primary_key=True)
     full_name = models.CharField(max_length=255)
     age_today = models.IntegerField(max_length=255)
-    gender = models.CharField(max_length=5, blank=True, null=True)
+    gender = models.CharField(max_length=6, blank=True, null=True, choices=GENDER_TYPE)
     city = models.CharField(max_length=255, blank=True, null=True)
     state = models.CharField(max_length=255, blank=True, null=True)
     country = models.CharField(max_length=255, blank=True, null=True)

@@ -1,6 +1,6 @@
 from django.conf.urls import url
 from controller.views import ProductList, ProductCreate, ProductUpdate, ProductDelete, \
-    PXStaffList, PXStaffCreate, PXStaffUpdate, PXStaffDelete
+    PXStaffList, PXStaffCreate, PXStaffUpdate, PXStaffDelete, ParentUpdate, CadetUpdate
 
 
 urlpatterns = [
@@ -35,4 +35,7 @@ urlpatterns = [
         PXStaffUpdate.as_view(), name='accounts_update'),
     url(r'Admin/accounts/(?P<pk>[0-9]+)/delete/$',
         PXStaffDelete.as_view(), name='accounts_delete'),
+    url(r'Parent/update/(?P<pk>[0-9]+)/$', ParentUpdate.as_view()),
+    url(r'Cadet/update/(?P<pk>[0-9]+)/$', CadetUpdate.as_view()),
+    url(r'Cadet/add_reward/(?P<pk>[0-9]+)/$', 'controller.views.add_cadet_reward'),
 ]

@@ -236,3 +236,14 @@ class GeneralSettings(models.Model):
     def __unicode__(self):
         return "General Settings"
     
+    
+class RevertTransaction(models.Model):
+    i_trans_revert = models.AutoField(primary_key=True)
+    transaction = models.ForeignKey(CompleteTransaction)
+    created_by = models.ForeignKey(UserProfile, related_name='created_by')
+    approved_by = models.ForeignKey(UserProfile, related_name='approved_by', blank=True, null=True)
+    approved_time = models.DateTimeField(default=datetime.datetime.now)
+    approval_status = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return self.transaction

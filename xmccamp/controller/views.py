@@ -224,12 +224,13 @@ def parent_list(request):
 @login_required
 def get_parent_list_json(request):
     column = ['pk', 'full_name', 'gender', 'email_address', 
-    'cell_phone_number', 'business_phone_number', 'home_phone_number', 
-    'funds__remaining_amount', 'funds__is_active', 'pk']
+              'cell_phone_number', 'business_phone_number', 'home_phone_number', 
+              'funds__remaining_amount', 'funds__is_active', 'pk']
     parent_list = list(Parent.objects.filter(user__group='PP').values_list(*column))
     parent_list = [list(row) for row in parent_list if row[8] == True or row[8] is None]
-    for row in parent_list:
+    for row in parent_list:        
         row.pop(8)
+        row[7] = format(row[7], '.2f')
     return HttpResponse(json.dumps(parent_list))
     
     
@@ -509,6 +510,7 @@ class PXStaffCreate(CreateView):
         user_profile.user = user
         user_profile.save()
         form.instance.user = user_profile
+        messages.success(self.request, "Successfully, created account of %s." % form.cleaned_data['full_name'])
         return super(PXStaffCreate, self).form_valid(form)
         
     @classmethod
@@ -532,6 +534,10 @@ class PXStaffUpdate(UpdateView):
         form.fields['password'].widget = forms.PasswordInput()
         form.fields['email_address'].widget.attrs['readonly'] = True
         return form
+        
+    def form_valid(self, form):
+        messages.success(self.request, "Successfully, updated selected account.")
+        return super(PXStaffUpdate, self).form_valid(form)
     
     @classmethod
     def as_view(cls):
@@ -555,3 +561,42 @@ class PXStaffDelete(DeleteView):
     @classmethod
     def as_view(cls):
         return login_required(super(PXStaffDelete, cls).as_view())
+
+
+
+class TransactionList(ListView):
+    model = CompleteTransaction
+    fields = '__all__'
+    template_name = 'controller/pages/sales/sales_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(TransactionList, self).get_context_data(**kwargs)
+        context['permission'] = self.request.user.userprofile.group
+        return context
+        
+    @classmethod
+    def as_view(cls):
+        return login_required(super(TransactionList, cls).as_view())
+
+@login_required
+def get_sales_history_json(request):
+    class MyEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, datetime.datetime):
+                return obj.strftime("%d-%m-%Y %H:%M:%S")
+            return obj
+    column = ['pk', 'cadet__full_name', 'transaction__product__name', 
+              'transaction__quantity', 'transaction__cost', 'created_time', 'pk']
+    sales_list = list(CompleteTransaction.objects.values_list(*column))
+    return HttpResponse(json.dumps(sales_list, cls=MyEncoder))
+    
+    
+@login_required
+def revert_trasaction(request, pk):
+    redirect_to = '/Canteen/sales_history/'
+    try:
+        messages.success(request, "Successfully sent transaction revert request for approval.")
+    except Exception as ex:
+        messages.error(request, "Sorry, unable to sent transaction revert request for approval.")
+        
+    return redirect(redirect_to)

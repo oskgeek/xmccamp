@@ -24,7 +24,7 @@
 
     <!-- DataTables Responsive CSS -->
     <link href="{% static 'bower_components/datatables-responsive/css/dataTables.responsive.css' %}" rel="stylesheet">
-    
+
     <!-- Searchable Select -->
     <link href="{% static 'bower_components/chosen/chosen.min.css' %}" rel="stylesheet">
 
@@ -49,9 +49,9 @@
             height: 34px;
             border: 1px solid #D3D3D3;
             border-radius: 3px;
-            background: none; 
+            background: none;
             background-clip: padding-box;
-            box-shadow: none; 
+            box-shadow: none;
             color: #555;
             text-decoration: none;
             white-space: nowrap;
@@ -63,7 +63,7 @@
             border-bottom-right-radius: 0;
             -moz-border-radius-bottomleft: 0;
             border-bottom-left-radius: 0;
-            background-image: none; 
+            background-image: none;
             box-shadow: 0 1px 0 #fff inset;
         }
         #pre_loader{
@@ -198,7 +198,7 @@
 
     <!-- Metis Menu Plugin JavaScript -->
     <script src="{% static 'bower_components/metisMenu/dist/metisMenu.min.js' %}"></script>
-    
+
     <script src="{% static 'bower_components/chosen/chosen.jquery.min.js' %}"></script>
 
     <!-- DataTables JavaScript -->
@@ -213,17 +213,17 @@
 
     <script type="text/javascript">
     $(function () {
-        
+
         // var products = [];
         // $('[name^="product-"] option').each(function(index, el) {
-            
+
         //     if ($(el).val()) {
         //         var product = [];
-            
+
         //         product.push($(el).val());
         //         product.push($(el).attr('data-price'));
         //         product.push($(el).text());
-                
+
         //         products.push(product);
         //     };
         // });
@@ -232,7 +232,7 @@
         $('[name^="product-"]').chosen({allow_single_deselect: true});
 
         calcProductPriceAndTotal();
-        
+
         var n = 1;
         $('#addNewProduct').click(function(event) {
             var productRow = $('.product-row:first');
@@ -245,7 +245,7 @@
                 $('.product-row:not(:first)').find('#addNewProduct').parent().remove();
                 $('.product-row:last').find('.chosen-container').remove();
                 $('.product-row:last').find('[name^="product-"]').attr('name', 'product-'+n);
-                $('.product-row:last').find('[name^="quantity-"]').val('').attr('name', 'quantity-'+n);
+                $('.product-row:last').find('[name^="quantity-"]').val(1).attr('name', 'quantity-'+n);
                 $('.product-row:last').find('[name^="product_cost-"]').val('').attr('name', 'product_cost-'+n);
 
                 /* Removing Previous Selected Product on New Product */
@@ -292,7 +292,7 @@
 
         /* Preloader --START */
             var $loader = $('#pre_loader');
-            
+
             $(document).ajaxStart(function () {
                 $loader.show();
             })

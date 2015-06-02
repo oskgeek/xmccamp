@@ -135,20 +135,20 @@
                 responsive: true,
                 "data": data,
                 "columns": [
-                    null,null,null,null,null,null,null,null,                    
+                    null,null,null,null,null,null,null,null,
                     {
                     "orderable":      false,
                     "data":           null,
-                    "defaultContent": '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="" class="edit-parent" title="Update"><span class="fa fa-edit"><span></a>'
+                    "defaultContent": '<div class="text-center"><a href="" class="edit-parent" title="Update"><span class="fa fa-edit"><span></a></div>'
                     }
                 ]
             });
-            
+
             $('.edit-parent').each(function(index, el) {
                 var parent_id = $(this).parents('tr:first').find('td:first').text();
                 $(this).attr('href', '/Parent/update/'+parent_id+'/');
             });
-            
+
         });
     });
     </script>

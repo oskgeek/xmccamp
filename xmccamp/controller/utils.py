@@ -25,10 +25,10 @@ def mail(to, subject, text, attach=None):
     msg['From'] = gmail_user
     msg['To'] = to
     msg['Subject'] = subject
-    
-    msg.attach(MIMEText(text, 'html'))    
-    
-    #logo part
+
+    msg.attach(MIMEText(text, 'html'))
+
+    # logo part
     fp = open(settings.MEDIA_ROOT + 'files_library/logo.png', 'rb')
     msgImage = MIMEImage(fp.read())
     fp.close()
@@ -100,7 +100,8 @@ def register_cadets(file_path, msg=None):
                     continue
                 print "creating parents"
                 try:
-                    lookup = {'email_address': field_dict.get('Primary P/G: Email address', '')}
+                    lookup = {'email_address': field_dict.get(
+                        'Primary P/G: Email address', '')}
                     primary_parent_obj = Parent.objects.get(**lookup)
                     pp_status = True
                 except Parent.DoesNotExist:
@@ -119,7 +120,8 @@ def register_cadets(file_path, msg=None):
 
                 print "creating cadet profile"
                 try:
-                    lookup = {'full_name': field_dict.get('Participant: Name', '')}
+                    lookup = {
+                        'full_name': field_dict.get('Participant: Name', '')}
                     cadet_obj = Cadet.objects.get(**lookup)
                 except Cadet.DoesNotExist:
                     cadet_obj = Cadet()
@@ -204,4 +206,3 @@ def get_latest_payments(msg=None):
     except Exception as ex:
         msg['status'] = 'FAILED'
         msg['Error'].append(repr(ex))
-

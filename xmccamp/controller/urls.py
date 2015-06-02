@@ -1,6 +1,6 @@
 from django.conf.urls import url
 from controller.views import ProductList, ProductCreate, ProductUpdate, ProductDelete, \
-    PXStaffList, PXStaffCreate, PXStaffUpdate, PXStaffDelete, ParentUpdate, CadetUpdate, TransactionList
+    PXStaffList, PXStaffCreate, PXStaffUpdate, PXStaffDelete, ParentUpdate, CadetUpdate, TransactionList, ApprovalPendingTransactionList
 
 
 urlpatterns = [
@@ -37,8 +37,19 @@ urlpatterns = [
         PXStaffDelete.as_view(), name='accounts_delete'),
     url(r'Parent/update/(?P<pk>[0-9]+)/$', ParentUpdate.as_view()),
     url(r'Cadet/update/(?P<pk>[0-9]+)/$', CadetUpdate.as_view()),
-    url(r'Cadet/add_reward/(?P<pk>[0-9]+)/$', 'controller.views.add_cadet_reward'),
-    url(r'Canteen/sales_history/$', TransactionList.as_view(), name='sales_list'),
-    url(r'^get_sales_history_json/$', 'controller.views.get_sales_history_json'),
-    url(r'^Canteen/revert_trasaction/(?P<pk>[0-9]+)/$', 'controller.views.revert_trasaction'),
+    url(r'Cadet/add_reward/(?P<pk>[0-9]+)/$',
+        'controller.views.add_cadet_reward'),
+    url(r'Canteen/sales_history/$',
+        TransactionList.as_view(), name='sales_list'),
+    url(r'^get_sales_history_json/$',
+        'controller.views.get_sales_history_json'),
+    url(r'^Canteen/revert_trasaction/(?P<pk>[0-9]+)/$',
+        'controller.views.revert_trasaction'),
+    url(r'Admin/approval_pending_transactions/$',
+        ApprovalPendingTransactionList.as_view(), name='pending_transaction_list'),
+    url(r'^get_revert_transactions_json/$',
+        'controller.views.get_revert_transactions_json'),
+    url(r'^Admin/revert_trasaction_confirm/(?P<pk>[0-9]+)/$',
+        'controller.views.revert_trasaction_confirm'),
+
 ]

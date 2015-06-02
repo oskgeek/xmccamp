@@ -39,7 +39,8 @@ class Parent(models.Model):
     i_parent = models.AutoField(primary_key=True)
     user = models.OneToOneField(UserProfile)
     full_name = models.CharField(max_length=255)
-    gender = models.CharField(max_length=6, blank=True, null=True, choices=GENDER_TYPE)
+    gender = models.CharField(
+        max_length=6, blank=True, null=True, choices=GENDER_TYPE)
     email_address = models.EmailField(max_length=255, unique=True)
     cell_phone_number = models.CharField(max_length=255, blank=True, null=True)
     business_phone_number = models.CharField(
@@ -93,11 +94,12 @@ class Parent(models.Model):
                 user_profile.save()
                 self.user = user_profile
                 self.save()
-                
+
                 funds_obj = Funds()
                 funds_obj.parent = self
                 funds_obj.amount = float(data.get('Initial_Funds', 0))
-                funds_obj.remaining_amount = float(data.get('Initial_Funds', 0))
+                funds_obj.remaining_amount = float(
+                    data.get('Initial_Funds', 0))
                 funds_obj.currency = 'USD'
                 funds_obj.name = 'Initial'
                 funds_obj.recieved_time = datetime.datetime.now()
@@ -132,7 +134,8 @@ class Cadet(models.Model):
     i_cadet = models.AutoField(primary_key=True)
     full_name = models.CharField(max_length=255)
     age_today = models.IntegerField(max_length=255)
-    gender = models.CharField(max_length=6, blank=True, null=True, choices=GENDER_TYPE)
+    gender = models.CharField(
+        max_length=6, blank=True, null=True, choices=GENDER_TYPE)
     city = models.CharField(max_length=255, blank=True, null=True)
     state = models.CharField(max_length=255, blank=True, null=True)
     country = models.CharField(max_length=255, blank=True, null=True)
@@ -188,7 +191,7 @@ class PXStaff(models.Model):
     i_px_manager = models.AutoField(primary_key=True)
     user = models.OneToOneField(UserProfile)
     full_name = models.CharField(max_length=255)
-    email_address = models.EmailField(max_length=255, blank=True, null=True)
+    email_address = models.EmailField(max_length=255, unique=True)
     password = models.CharField(max_length=255, blank=True, null=True)
     account_type = models.CharField(max_length=2, choices=ACCOUNT_TYPE)
 
@@ -215,7 +218,7 @@ class SubTransaction(models.Model):
     cost = models.FloatField()
 
     def __unicode__(self):
-        return self.product
+        return 'Product Purchased %s with %d quantity' % (self.product.name, self.quantity)
 
 
 class CompleteTransaction(models.Model):
@@ -232,18 +235,19 @@ class CompleteTransaction(models.Model):
 class GeneralSettings(models.Model):
     i_settings = models.AutoField(primary_key=True)
     configuration = JSONField()
-    
+
     def __unicode__(self):
         return "General Settings"
-    
-    
+
+
 class RevertTransaction(models.Model):
     i_trans_revert = models.AutoField(primary_key=True)
-    transaction = models.ForeignKey(CompleteTransaction)
+    transaction = models.ForeignKey(SubTransaction)
     created_by = models.ForeignKey(UserProfile, related_name='created_by')
-    approved_by = models.ForeignKey(UserProfile, related_name='approved_by', blank=True, null=True)
+    approved_by = models.ForeignKey(
+        UserProfile, related_name='approved_by', blank=True, null=True)
     approved_time = models.DateTimeField(default=datetime.datetime.now)
     approval_status = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return self.transaction
+        return 'Replica of Transaction %s' % self.transaction

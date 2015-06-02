@@ -18,7 +18,7 @@ from django.template.loader import render_to_string
 from django.contrib import messages
 
 from django.contrib.auth.models import User
-from controller.models import UserProfile, Cadet, Parent, Session, Funds, CompleteTransaction, Product, SubTransaction, PXStaff
+from controller.models import UserProfile, Cadet, Parent, Session, Funds, CompleteTransaction, Product, SubTransaction, PXStaff, RevertTransaction
 from controller.utils import mail, register_cadets, handle_uploaded_file, get_latest_payments
 
 
@@ -71,31 +71,33 @@ def cadets_list(request):
 
 @login_required
 def get_cadet_list_json(request):
-    column = ['pk', 'full_name', 'primary_parent__full_name', 'age_today', 'gender', 'email_address',
+    column = [
+        'pk', 'full_name', 'primary_parent__full_name', 'age_today', 'gender', 'email_address',
               'zip_code', 'city', 'state', 'country', 'primary_parent_id']
     cadet_list = list(Cadet.objects.values_list(*column))
     return HttpResponse(json.dumps(cadet_list))
 
-   
+
 class CadetUpdate(UpdateView):
     model = Cadet
     fields = ['full_name', 'age_today', 'gender', 'email_address',
               'zip_code', 'city', 'state', 'country']
     template_name = 'controller/pages/cadets/cadet_update_form.html'
     success_url = '/cadets_list/'
-    
+
     def get_context_data(self, **kwargs):
         context = super(CadetUpdate, self).get_context_data(**kwargs)
         context['permission'] = self.request.user.userprofile.group
         return context
-        
+
     def form_valid(self, form):
         messages.success(self.request, "Successfully updated cadet's details.")
         return super(UpdateView, self).form_valid(form)
-            
+
     @classmethod
     def as_view(cls):
         return login_required(super(CadetUpdate, cls).as_view())
+
 
 @login_required
 def add_cadet_reward(request, pk):
@@ -114,8 +116,10 @@ def add_cadet_reward(request, pk):
         funds_obj.name = 'Manual'
         funds_obj.recieved_time = datetime.datetime.now()
         funds_obj.save()
-    messages.success(request, "Successfully added $10 reward in cadet's account.")
+    messages.success(
+        request, "Successfully added $10 reward in cadet's account.")
     return redirect(redirect_to)
+
 
 @login_required
 def parent_send_emails(request):
@@ -124,16 +128,18 @@ def parent_send_emails(request):
         domain = request.build_absolute_uri('/')[:-1]
         lookup = {'user__group': 'PP', 'secret_code__isnull': True}
         parent_qs = Parent.objects.filter(**lookup)
-        
+
         if len(parent_qs) <= 0:
             response_dict['status'] = 'FAILED'
-            response_dict['Error'] = 'Sorry, please register a new parent to send registration email.'
-            
+            response_dict[
+                'Error'] = 'Sorry, please register a new parent to send registration email.'
+
         for parent_obj in parent_qs:
             secret_code = str(uuid.uuid4())
             secret_code_url = "%s/Parent/Register/?code=%s" % (
                 domain, secret_code)
-            message_body = render_to_string('controller/pages/parent_reg_email_template.html', {'url': secret_code_url })  
+            message_body = render_to_string(
+                'controller/pages/parent_reg_email_template.html', {'url': secret_code_url})
             print "Sending Email to : %s" % parent_obj.full_name
             mail(parent_obj.email_address,
                  "Welcome to XMC Online Canteen Management!",
@@ -223,29 +229,31 @@ def parent_list(request):
 
 @login_required
 def get_parent_list_json(request):
-    column = ['pk', 'full_name', 'gender', 'email_address', 
-              'cell_phone_number', 'business_phone_number', 'home_phone_number', 
+    column = ['pk', 'full_name', 'gender', 'email_address',
+              'cell_phone_number', 'business_phone_number', 'home_phone_number',
               'funds__remaining_amount', 'funds__is_active', 'pk']
-    parent_list = list(Parent.objects.filter(user__group='PP').values_list(*column))
-    parent_list = [list(row) for row in parent_list if row[8] == True or row[8] is None]
-    for row in parent_list:        
+    parent_list = list(Parent.objects.filter(
+        user__group='PP').values_list(*column))
+    parent_list = [list(row)
+                   for row in parent_list if row[8] == True or row[8] is None]
+    for row in parent_list:
         row.pop(8)
         row[7] = format(row[7], '.2f')
     return HttpResponse(json.dumps(parent_list))
-    
-    
+
+
 class ParentUpdate(UpdateView):
     model = Parent
-    fields = ['full_name', 'gender', 'email_address', 'cell_phone_number', 
+    fields = ['full_name', 'gender', 'email_address', 'cell_phone_number',
               'business_phone_number', 'home_phone_number']
     template_name = 'controller/pages/parents/parent_update_form.html'
     success_url = '/parent_list/'
-    
+
     def get_context_data(self, **kwargs):
         context = super(ParentUpdate, self).get_context_data(**kwargs)
         context['permission'] = self.request.user.userprofile.group
         return context
-        
+
     def get_form(self, form_class):
         form = super(UpdateView, self).get_form(form_class)
         remaining_amount = 0
@@ -253,10 +261,10 @@ class ParentUpdate(UpdateView):
             fund_obj = form.instance.funds_set.get(is_active=True)
             remaining_amount = fund_obj.remaining_amount
         except Funds.DoesNotExist:
-            pass            
+            pass
         form.fields['Balance'] = forms.CharField(initial=remaining_amount)
         return form
-        
+
     def form_valid(self, form):
         response = super(UpdateView, self).form_valid(form)
         remaining_amount = form.cleaned_data['Balance']
@@ -273,13 +281,13 @@ class ParentUpdate(UpdateView):
             funds_obj.name = 'Manual'
             funds_obj.recieved_time = datetime.datetime.now()
             funds_obj.save()
-        messages.success(self.request, "Successfully updated parent's details.")        
+        messages.success(
+            self.request, "Successfully updated parent's details.")
         return response
-    
+
     @classmethod
     def as_view(cls):
         return login_required(super(ParentUpdate, cls).as_view())
-
 
 
 @login_required
@@ -316,8 +324,9 @@ def get_cadet_purchase_history(request):
     response = dict(status='UNKNOWN', Error=[])
     try:
         if request.method == 'GET':
-            column = ['cadet__full_name', 'transaction__product__name', 'transaction__quantity',
-                      'transaction__cost', 'created_time']
+            column = [
+                'cadet__full_name', 'transaction__product__name', 'transaction__quantity',
+                'transaction__cost', 'created_time']
             lookup = {'cadet__primary_parent__user__user': request.user}
             recent_transc_data = list(CompleteTransaction.objects.filter(
                 **lookup).order_by('created_time').values_list(*column))
@@ -342,15 +351,16 @@ class ProductList(ListView):
     def get_context_data(self, **kwargs):
         context = super(ProductList, self).get_context_data(**kwargs)
         columns = ['pk', 'name', 'description', 'cost_per_unit', 'blank']
-        object_list = list(context['object_list'].extra(select={'blank': "null"}).values_list(*columns))
-        object_list = [[str(y) for y in x] for x in object_list]        
+        object_list = list(context['object_list'].extra(
+            select={'blank': "null"}).values_list(*columns))
+        object_list = [[str(y) for y in x] for x in object_list]
         context['object_list'] = json.dumps(object_list)
         context['permission'] = self.request.user.userprofile.group
         return context
-        
+
     @classmethod
     def as_view(cls):
-        return login_required(super(ProductList, cls).as_view())        
+        return login_required(super(ProductList, cls).as_view())
 
 
 class ProductCreate(CreateView):
@@ -358,10 +368,10 @@ class ProductCreate(CreateView):
     fields = '__all__'
     template_name = 'controller/pages/product_create_form.html'
     success_url = '/Canteen/product/'
-    
+
     @classmethod
     def as_view(cls):
-        return login_required(super(ProductCreate, cls).as_view())    
+        return login_required(super(ProductCreate, cls).as_view())
 
 
 class ProductUpdate(UpdateView):
@@ -369,10 +379,10 @@ class ProductUpdate(UpdateView):
     fields = '__all__'
     template_name = 'controller/pages/product_update_form.html'
     success_url = '/Canteen/product/'
-    
+
     @classmethod
     def as_view(cls):
-        return login_required(super(ProductUpdate, cls).as_view())    
+        return login_required(super(ProductUpdate, cls).as_view())
 
 
 class ProductDelete(DeleteView):
@@ -382,7 +392,7 @@ class ProductDelete(DeleteView):
 
     def get(self, *args, **kwargs):
         return self.post(*args, **kwargs)
-        
+
     @classmethod
     def as_view(cls):
         return login_required(super(ProductDelete, cls).as_view())
@@ -430,13 +440,15 @@ def manage_transactions(request):
 
             fund_obj.remaining_amount -= total_cost
             fund_obj.save()
-            
+
             if fund_obj.remaining_amount < 20.0:
                 url = "%s/home/" % request.build_absolute_uri('/')[:-1]
                 subject = "Alert: XMC Canteen Low Balance!"
-                message_body = render_to_string('controller/pages/parent_low_balance_email_template.html', {'url': url, 'amount': fund_obj.remaining_amount, 'datetime': str(datetime.datetime.now()) })
-                mail(fund_obj.parent.email_address, subject, message_body.encode('UTF8'))
-            
+                message_body = render_to_string('controller/pages/parent_low_balance_email_template.html', {
+                                                'url': url, 'amount': fund_obj.remaining_amount, 'datetime': str(datetime.datetime.now())})
+                mail(fund_obj.parent.email_address,
+                     subject, message_body.encode('UTF8'))
+
             response['status'] = 'OK'
         else:
             context = {}
@@ -462,7 +474,6 @@ def manage_transactions(request):
     return HttpResponse(json.dumps(response))
 
 
-
 class PXStaffList(ListView):
     model = PXStaff
     fields = '__all__'
@@ -476,7 +487,7 @@ class PXStaffList(ListView):
         context['object_list'] = json.dumps(object_list)
         context['permission'] = self.request.user.userprofile.group
         return context
-        
+
     @classmethod
     def as_view(cls):
         return login_required(super(PXStaffList, cls).as_view())
@@ -487,32 +498,33 @@ class PXStaffCreate(CreateView):
     fields = ['full_name', 'email_address', 'password', 'account_type']
     template_name = 'controller/pages/accounts/account_create_form.html'
     success_url = '/Admin/accounts/'
-    
+
     def get_context_data(self, **kwargs):
         context = super(PXStaffCreate, self).get_context_data(**kwargs)
         context['permission'] = self.request.user.userprofile.group
         return context
-    
+
     def get_form(self, form_class):
         form = super(PXStaffCreate, self).get_form(form_class)
         form.fields['password'].widget = forms.PasswordInput()
         return form
-        
+
     def form_valid(self, form):
         email = form.cleaned_data['email_address']
         password = form.cleaned_data['password']
         group = form.cleaned_data['account_type']
         user = User.objects.create_user(
-                    username=email, password=password, email=email)
+            username=email, password=password, email=email)
         user.save()
         user_profile = UserProfile()
         user_profile.group = group
         user_profile.user = user
         user_profile.save()
         form.instance.user = user_profile
-        messages.success(self.request, "Successfully, created account of %s." % form.cleaned_data['full_name'])
+        messages.success(self.request, "Successfully, created account of %s." %
+                         form.cleaned_data['full_name'])
         return super(PXStaffCreate, self).form_valid(form)
-        
+
     @classmethod
     def as_view(cls):
         return login_required(super(PXStaffCreate, cls).as_view())
@@ -523,22 +535,23 @@ class PXStaffUpdate(UpdateView):
     fields = ['full_name', 'email_address', 'password', 'account_type']
     template_name = 'controller/pages/accounts/account_update_form.html'
     success_url = '/Admin/accounts/'
-    
+
     def get_context_data(self, **kwargs):
         context = super(PXStaffUpdate, self).get_context_data(**kwargs)
         context['permission'] = self.request.user.userprofile.group
         return context
-        
+
     def get_form(self, form_class):
         form = super(PXStaffUpdate, self).get_form(form_class)
         form.fields['password'].widget = forms.PasswordInput()
         form.fields['email_address'].widget.attrs['readonly'] = True
         return form
-        
+
     def form_valid(self, form):
-        messages.success(self.request, "Successfully, updated selected account.")
+        messages.success(
+            self.request, "Successfully, updated selected account.")
         return super(PXStaffUpdate, self).form_valid(form)
-    
+
     @classmethod
     def as_view(cls):
         return login_required(super(PXStaffUpdate, cls).as_view())
@@ -551,17 +564,16 @@ class PXStaffDelete(DeleteView):
 
     def get(self, *args, **kwargs):
         return self.post(*args, **kwargs)
-        
+
     def get_object(self, queryset=None):
         obj = super(PXStaffDelete, self).get_object()
         obj.user.user.delete()
         obj.user.delete()
         return obj
-        
+
     @classmethod
     def as_view(cls):
         return login_required(super(PXStaffDelete, cls).as_view())
-
 
 
 class TransactionList(ListView):
@@ -573,30 +585,117 @@ class TransactionList(ListView):
         context = super(TransactionList, self).get_context_data(**kwargs)
         context['permission'] = self.request.user.userprofile.group
         return context
-        
+
     @classmethod
     def as_view(cls):
         return login_required(super(TransactionList, cls).as_view())
 
+
 @login_required
 def get_sales_history_json(request):
     class MyEncoder(json.JSONEncoder):
+
         def default(self, obj):
             if isinstance(obj, datetime.datetime):
                 return obj.strftime("%d-%m-%Y %H:%M:%S")
             return obj
-    column = ['pk', 'cadet__full_name', 'transaction__product__name', 
-              'transaction__quantity', 'transaction__cost', 'created_time', 'pk']
+    column = [
+        'transaction__pk', 'cadet__full_name', 'transaction__product__name',
+        'transaction__quantity', 'transaction__cost', 'created_time', 'pk']
+    exclude_trans_list = RevertTransaction.objects.values_list('transaction_id', flat=True)
     sales_list = list(CompleteTransaction.objects.values_list(*column))
+    sales_list = [row for row in sales_list if row[0] not in exclude_trans_list]
+
     return HttpResponse(json.dumps(sales_list, cls=MyEncoder))
-    
-    
+
+
 @login_required
 def revert_trasaction(request, pk):
     redirect_to = '/Canteen/sales_history/'
     try:
-        messages.success(request, "Successfully sent transaction revert request for approval.")
+        args = dict()
+        args['transaction_id'] = pk
+        args['created_by'] = request.user.userprofile
+        revert_trans_obj = RevertTransaction(**args)
+        revert_trans_obj.save()
+        messages.success(
+            request, "Successfully sent transaction revert request for approval.")
     except Exception as ex:
-        messages.error(request, "Sorry, unable to sent transaction revert request for approval.")
-        
+        messages.error(
+            request, "Sorry, unable to sent transaction revert request for approval.")
+
+    return redirect(redirect_to)
+
+
+class ApprovalPendingTransactionList(ListView):
+    model = RevertTransaction
+    fields = '__all__'
+    template_name = 'controller/pages/sales/approval_pending_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ApprovalPendingTransactionList, self).get_context_data(**kwargs)
+        context['permission'] = self.request.user.userprofile.group
+        return context
+
+    @classmethod
+    def as_view(cls):
+        return login_required(super(ApprovalPendingTransactionList, cls).as_view())
+
+
+@login_required
+def get_revert_transactions_json(request):
+    class MyEncoder(json.JSONEncoder):
+
+        def default(self, obj):
+            if isinstance(obj, datetime.datetime):
+                return obj.strftime("%d-%m-%Y %H:%M:%S")
+            else:
+                raise TypeError("Unserializable object {} of type {}".format(obj, type(obj)))
+            return obj
+    column = [
+        'pk', 'transaction__completetransaction__cadet__full_name', 'transaction__product__name',
+        'transaction__quantity', 'transaction__cost', 'transaction__completetransaction__created_time', 'pk']
+    approval_transaction_list = list(RevertTransaction.objects.filter(approval_status=False).values_list(*column))
+    return HttpResponse(json.dumps(approval_transaction_list, cls=MyEncoder))
+
+
+@login_required
+def revert_trasaction_confirm(request, pk):
+    redirect_to = '/Admin/approval_pending_transactions/'
+    try:
+        transaction_obj = RevertTransaction.objects.get(pk=pk)
+        amount_to_return = transaction_obj.transaction.cost
+        transaction_obj.approved_time = datetime.datetime.now()
+        transaction_obj.approval_status = True
+        transaction_obj.approved_by = request.user.userprofile
+
+        pp_pk = transaction_obj.transaction.completetransaction_set.get().cadet.primary_parent.pk
+
+        try:
+            lookup = {'parent_id': pp_pk, 'is_active': True}
+            fund_obj = Funds.objects.get(**lookup)
+            fund_obj.remaining_amount += float(amount_to_return)
+            fund_obj.save()
+        except Funds.DoesNotExist:
+            funds_obj = Funds()
+            funds_obj.parent_id = pp_pk
+            funds_obj.amount = float(amount_to_return)
+            funds_obj.remaining_amount = float(amount_to_return)
+            funds_obj.currency = 'USD'
+            funds_obj.name = 'Manual'
+            funds_obj.recieved_time = datetime.datetime.now()
+            funds_obj.save()
+
+        transaction_obj.save()
+
+        messages.success(
+            request, "Successfully refunded fund to cadet account.")
+    except RevertTransaction.DoesNotExist:
+        messages.error(
+            request, "Please, select a valid transaction id.")
+    except Exception as ex:
+        print ex
+        messages.error(
+            request, "Sorry, unable to sent transaction revert request for approval.")
+
     return redirect(redirect_to)

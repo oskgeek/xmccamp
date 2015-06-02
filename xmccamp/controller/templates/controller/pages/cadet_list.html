@@ -81,7 +81,7 @@
                                     <thead>
                                         <tr>
                                             <th class="col-md-1">Sr. No#</th>
-                                            <th class="col-md-1">Full Name</th>
+                                            <th class="col-md-2">Full Name</th>
                                             <th class="col-md-1">Parent</th>
                                             <th class="col-md-1">Age</th>
                                             <th class="col-md-1">Gender</th>
@@ -90,7 +90,7 @@
                                             <th class="col-md-1">City</th>
                                             <th class="col-md-1">State</th>
                                             <th class="col-md-1">Country</th>
-                                            <th class="col-md-2"></th>
+                                            <th class="col-md-1"></th>
                                         </tr>
                                     </thead>
                                 </table>
@@ -144,27 +144,27 @@
                     null,
                     null,
                     null,
-                    null,                    
-                    null,                    
-                    null,                    
+                    null,
+                    null,
+                    null,
                     {
                     "orderable":      false,
                     "data":           null,
-                    "defaultContent": '&nbsp;&nbsp;<a href="" class="edit-cadet" title="Update"><span class="fa fa-edit"><span></a>&nbsp;&nbsp;&nbsp;<a href="" class="add-reward" title="Add Reward"><span class="fa fa-money"><span></a>'
+                    "defaultContent": '<div class="text-center"><a href="" class="edit-cadet" title="Update"><span class="fa fa-edit"><span></a>&nbsp;&nbsp;<a href="" class="add-reward" title="Add Reward"><span class="fa fa-money"><span></a></div>'
                     }
                 ]
             });
-            
+
             $('.edit-cadet').each(function(index, el) {
                 var parent_id = $(this).parents('tr:first').find('td:first').text();
                 $(this).attr('href', '/Cadet/update/'+parent_id+'/');
             });
-            
+
             $('.add-reward').each(function(index, el) {
                 var row_content = table.row( $(this).parents('tr') ).data();
                 $(this).attr('href', '/Cadet/add_reward/'+ row_content[ 10 ] + '/');
             });
-            
+
         });
     });
     </script>

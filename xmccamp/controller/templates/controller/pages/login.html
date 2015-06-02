@@ -35,12 +35,46 @@
             text-align: center;
             padding-bottom: 20px;
         }
+        #pre_loader{
+            display: none;
+            position: absolute;
+            z-index: 1091;
+            background: rgba(0, 0, 0, 0.08);
+            width: 100%;
+            height: 100%;
+        }
+        #pre_loader #pre_loader_content{
+            position: absolute;
+            background-color: white;
+            left: 44%;
+            top: 200px;
+            width: 150px;
+            height: 50px;
+            border-radius: 4px;
+        }
+        #pre_loader #pre_loader_content span{
+            position: absolute;
+            left: 3%;
+            top: 32%;
+        }
+        .huge {
+            font-size: 20px;
+        }
     </style>
 </head>
 
 <body>
+    <div id="pre_loader">
+                <span id="pre_loader_content">
+                    <span>
+                        <img src='{% static "controller/img/preloader.gif" %}' alt="pre-loader">
+                        &nbsp;&nbsp;Please wait..
+                    </span>
+                </span>
+            </div>
+
     <div class="container">
-        <div class="row">
+           <div class="row">
             <div class="col-md-4 col-md-offset-4">
                 <div class="login-panel panel panel-default">
                     <div class="panel-heading">
@@ -123,26 +157,46 @@
             });
         });
         $('#forget_password').click(function(event) {
-            $('#zform').animate( { "opacity": "hide", top:"100"} , 100 );
-            $('#xform').animate( { "opacity": "show", top:"100"} , 100 );
+            $('#zform').animate( { "opacity": "hide", top:"100"} , 10 );
+            $('#xform').animate( { "opacity": "show", top:"100"} , 10 );
         });
         $('#cancel').click(function(event) {
-            $('#zform').animate( { "opacity": "show", top:"100"} , 100 );
-            $('#xform').animate( { "opacity": "hide", top:"100"} , 100 );
+            $('.alert').remove();
+            $('#zform').animate( { "opacity": "show", top:"100"} , 10 );
+            $('#xform').animate( { "opacity": "hide", top:"100"} , 10 );
         });
         $('#forget').click(function(event) {
+            $('.alert').remove();
             $.post('/reset_password/', $('#xform').serialize(), function(data, textStatus, xhr) {
                 var data = $.parseJSON(data);
                 if (data.status == 'OK') {
+                    if ($('.alert-success').length == 0) {
+                        var html = '<div class="alert alert-success"><a href="#" class="alert-link">Successfully, sent password reset email, please check your inbox to continue... </a></div>';
+                        $('#xform').parent().prepend(html);
+                    };
                 }
                 else if (data.status == 'FAILED') {
                     if ($('.alert-danger').length == 0) {
                         var html = '<div class="alert alert-danger"><a href="#" class="alert-link">Oops! </a>'+data.Error+'</div>';
-                        $('#zform').parent().prepend(html);
+                        $('#xform').parent().prepend(html);
                     };
                 };
             });
         });
     });
+    
+    /* Preloader --START */
+        var $loader = $('#pre_loader');
+        
+        $(document).ajaxStart(function () {
+            $loader.show();
+        })
+        .ajaxStop(function () {
+            $loader.hide();
+        })
+        .ajaxError(function() {
+            $loader.hide();
+        });
+    /* Preloader --END */
 </script>
 </html>

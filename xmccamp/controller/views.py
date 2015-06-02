@@ -711,7 +711,23 @@ def revert_trasaction_confirm(request, pk):
 
 def reset_password(request):
     response_dict = {'status': 'FAILED', 'Error': []}
-    if request.method == 'POST':
+    if request.method == 'POST':        
         email = request.POST.get('forget_email', None)
-        response_dict['Error'] = 'Sorry, unable to verify provided credentials, try again!'
-        return HttpResponse(json.dumps(response_dict))
+        try:
+            parent_obj = Parent.objects.get(email_address=email)
+            domain = request.build_absolute_uri('/')[:-1]
+            secret_code = str(uuid.uuid4())
+            secret_code_url = "%s/Parent/Register/?code=%s" % (domain, secret_code)
+            message_body = render_to_string(
+                'controller/pages/forget_parent_password_template.html', {'url': secret_code_url})
+            mail(parent_obj.email_address,
+                 "Reset Your XMC Online Canteen Password!",
+                 message_body)
+            parent_obj.secret_code = secret_code
+            parent_obj.save()
+            response_dict['status'] = 'OK'
+            
+        except Parent.DoesNotExist:
+            response_dict['Error'] = 'Sorry, no account is associated with this email address.'
+    
+    return HttpResponse(json.dumps(response_dict))

@@ -191,6 +191,14 @@ def parent_registration(request):
                 parent_obj.home_phone_number = form_fields['home_phone_number']
                 parent_obj.save()
                 message = 'Successfully, saved your account changes.'
+                
+                user = authenticate(username=form_fields['email_address'], 
+                                    password=form_fields['password'])
+                if user is not None:
+                    if user.is_active:
+                        login(request, user)
+                        return redirect('/home/')
+
             except Parent.DoesNotExist:
                 message = 'Sorry, Unable to save your account changes.'
             form_fields['message'] = message

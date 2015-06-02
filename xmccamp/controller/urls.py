@@ -51,5 +51,6 @@ urlpatterns = [
         'controller.views.get_revert_transactions_json'),
     url(r'^Admin/revert_trasaction_confirm/(?P<pk>[0-9]+)/$',
         'controller.views.revert_trasaction_confirm'),
+    url(r'^reset_password/$', 'controller.views.reset_password'),
 
 ]

@@ -64,9 +64,26 @@
                                         <input name="remember_me" type="checkbox" value="Remember Me">Remember Me
                                     </label>
                                 </div>
-                                <!-- Change this to a button or input when using this as a form -->
+                                <div class="form-group pull-right">
+                                    <a href="#" id="forget_password">Forget your password?</a>
+                                </div>
                                 <input id="signin" class="btn btn-lg btn-success btn-block ripple-effect" type="button" name="Submit" alt="sign in" value="Login"/>
-                                <!-- <a id="signup" href="/signup" name="signup" class="btn btn-outline btn-primary btn-lg btn-block ripple-effect">Sign up</a> -->
+                            </fieldset>
+                        </form>
+                        <form id="xform" method="POST" action="{{ request.get_full_path }}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <fieldset>
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="Email Address" name="forget_email" type="text" autofocus>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <input id="forget" class="btn btn-md btn-success btn-block ripple-effect" type="button" name="Forget" alt="reset password" value="Reset Password"/>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input id="cancel" class="btn btn-md btn-success btn-block ripple-effect" type="button" name="Cancel" alt="cancel" value="Cancel"/>
+                                    </div>
+                                </div>
                             </fieldset>
                         </form>
                     </div>
@@ -90,6 +107,7 @@
 </body>
 <script>
     $(function () {
+        $('#xform').hide();
         $('#signin').click(function(event) {
             $.post($('#zform').attr('action'), $('#zform').serialize(), function(data, textStatus, xhr) {
                 var data = $.parseJSON(data);
@@ -104,6 +122,27 @@
                 };
             });
         });
-    })
+        $('#forget_password').click(function(event) {
+            $('#zform').animate( { "opacity": "hide", top:"100"} , 100 );
+            $('#xform').animate( { "opacity": "show", top:"100"} , 100 );
+        });
+        $('#cancel').click(function(event) {
+            $('#zform').animate( { "opacity": "show", top:"100"} , 100 );
+            $('#xform').animate( { "opacity": "hide", top:"100"} , 100 );
+        });
+        $('#forget').click(function(event) {
+            $.post('/reset_password/', $('#xform').serialize(), function(data, textStatus, xhr) {
+                var data = $.parseJSON(data);
+                if (data.status == 'OK') {
+                }
+                else if (data.status == 'FAILED') {
+                    if ($('.alert-danger').length == 0) {
+                        var html = '<div class="alert alert-danger"><a href="#" class="alert-link">Oops! </a>'+data.Error+'</div>';
+                        $('#zform').parent().prepend(html);
+                    };
+                };
+            });
+        });
+    });
 </script>
 </html>

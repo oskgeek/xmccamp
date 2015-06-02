@@ -191,8 +191,8 @@ def parent_registration(request):
                 parent_obj.home_phone_number = form_fields['home_phone_number']
                 parent_obj.save()
                 message = 'Successfully, saved your account changes.'
-                
-                user = authenticate(username=form_fields['email_address'], 
+
+                user = authenticate(username=form_fields['email_address'],
                                     password=form_fields['password'])
                 if user is not None:
                     if user.is_active:
@@ -707,3 +707,11 @@ def revert_trasaction_confirm(request, pk):
             request, "Sorry, unable to sent transaction revert request for approval.")
 
     return redirect(redirect_to)
+
+
+def reset_password(request):
+    response_dict = {'status': 'FAILED', 'Error': []}
+    if request.method == 'POST':
+        email = request.POST.get('forget_email', None)
+        response_dict['Error'] = 'Sorry, unable to verify provided credentials, try again!'
+        return HttpResponse(json.dumps(response_dict))

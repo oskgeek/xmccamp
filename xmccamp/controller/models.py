@@ -251,3 +251,15 @@ class RevertTransaction(models.Model):
 
     def __unicode__(self):
         return 'Replica of Transaction %s' % self.transaction
+
+
+class StickyNotes(models.Model):
+    i_note = models.AutoField(primary_key=True)
+    i_parent = models.ForeignKey(Parent, blank=True, null=True)
+    i_cadet = models.ForeignKey(Cadet, blank=True, null=True)
+    issued_by = models.ForeignKey(UserProfile)
+    issued_time = models.DateTimeField(default=datetime.datetime.now)
+    remarks = models.TextField()
+
+    def __unicode__(self):
+        return 'Note Issued to %s by %s' % (self.i_parent, self.issued_by)

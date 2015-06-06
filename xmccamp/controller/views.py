@@ -18,7 +18,7 @@ from django.template.loader import render_to_string
 from django.contrib import messages
 
 from django.contrib.auth.models import User
-from controller.models import UserProfile, Cadet, Parent, Session, Funds, CompleteTransaction, Product, SubTransaction, PXStaff, RevertTransaction
+from controller.models import UserProfile, Cadet, Parent, Session, Funds, CompleteTransaction, Product, SubTransaction, PXStaff, RevertTransaction, StickyNotes
 from controller.utils import mail, register_cadets, handle_uploaded_file, get_latest_payments
 
 
@@ -731,3 +731,44 @@ def reset_password(request):
             response_dict['Error'] = 'Sorry, no account is associated with this email address.'
     
     return HttpResponse(json.dumps(response_dict))
+
+
+
+class StickyNotesList(ListView):
+    model = StickyNotes
+    fields = '__all__'
+    template_name = 'controller/pages/sticky_notes/sticky_notes_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(StickyNotesList, self).get_context_data(**kwargs)
+        context['permission'] = self.request.user.userprofile.group
+        return context
+
+    @classmethod
+    def as_view(cls):
+        return login_required(super(StickyNotesList, cls).as_view())
+
+
+class StickyNotesCreate(CreateView):
+    model = StickyNotes
+    fields = ['full_name', 'email_address', 'password', 'account_type']
+    template_name = 'controller/pages/accounts/account_create_form.html'
+    success_url = '/Admin/accounts/'
+
+    def get_context_data(self, **kwargs):
+        context = super(StickyNotesCreate, self).get_context_data(**kwargs)
+        context['permission'] = self.request.user.userprofile.group
+        return context
+
+    def get_form(self, form_class):
+        form = super(StickyNotesCreate, self).get_form(form_class)
+        form.fields['password'].widget = forms.PasswordInput()
+        return form
+
+    def form_valid(self, form):
+        email = form.cleaned_data['email_address']
+        return super(StickyNotesCreate, self).form_valid(form)
+
+    @classmethod
+    def as_view(cls):
+        return login_required(super(StickyNotesCreate, cls).as_view())

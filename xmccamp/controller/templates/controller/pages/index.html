@@ -93,7 +93,7 @@
 </head>
 
 <body>
-    
+
     <div id="wrapper">
         <div id="pre_loader">
             <span id="pre_loader_content">
@@ -103,14 +103,14 @@
                 </span>
             </span>
         </div>
-        
+
         <!-- Navigation -->
         {% with permission as permission %}
             {% include 'controller/pages/nav.html' %}
         {% endwith %}
-        
+
         <!-- ADMIN BLOCK -->
-        {% if permission == 'AD' %} 
+        {% if permission == 'AD' %}
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
@@ -172,7 +172,7 @@
             </div>
         </div>
         {% endif %}
-        
+
         <!-- PARENT BLOCK -->
         {% if permission == 'PP' %}
         <div id="page-wrapper">
@@ -193,8 +193,8 @@
                                     <i class="fa fa-dollar fa-5x"></i>
                                 </div>
                                 <div class="col-xs-9 text-right">
-                                    <div>Fill multiples of 25$ you want to buy?</div>
-                                    <div class="row">                                        
+                                    <div>Multiples of $25 to be added to your account.</div>
+                                    <div class="row">
                                         <div class="col-xs-6 pull-right">
                                             <div class="form-group">
                                                 <input class="form-control" placeholder="Quantity" id="funds_quantity" type="number" min="1" value="1" required>
@@ -221,7 +221,7 @@
                                     <i class="fa fa-money fa-5x"></i>
                                 </div>
                                 <div class="col-xs-9 text-right">
-                                    <div>Account Balance!</div>
+                                    <div>Account Balance</div>
                                     <div id="accBalance" class="huge">0</div>
                                 </div>
                             </div>
@@ -271,7 +271,7 @@
                         <div class="panel-body">
                             <div class="dataTable_wrapper">
                                 <table class="table table-striped table-bordered table-hover" id="purchaseHistoryTable">
-                                    
+
                                 </table>
                             </div>
                         </div>
@@ -319,7 +319,7 @@
     <!-- // <script src="{% static 'bower_components/raphael/raphael-min.js' %}"></script> -->
     <!-- // <script src="{% static 'bower_components/morrisjs/morris.min.js' %}"></script> -->
     <!-- // <script src="{% static 'js/morris-data.js' %}"></script> -->
-    
+
     <!-- DataTables JavaScript -->
     <script src="{% static 'bower_components/datatables/media/js/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js' %}"></script>
@@ -330,7 +330,7 @@
     <script src="{% static 'js/jquery.form.js' %}"></script>
 
     {% if permission == 'AD' %}
-    <script>        
+    <script>
         $(function () {
 
             /* File format Validation */
@@ -365,7 +365,7 @@
                                         $('#alert-wrapper').html(error_msg(res.Error));
                                     };
                                 };
-                                
+
                             }
                         };
                         $("#zformemail").ajaxSubmit(options);
@@ -375,7 +375,7 @@
                     }
                 });
             /* File format Validation -- END */
-            
+
             $('#sendParentsEmail').click(function(event) {
                 $.get('/Parent/SendEmails', function(res) {
                     var res = $.parseJSON(res);
@@ -395,7 +395,7 @@
         })
     </script>
     {% endif %}
-    
+
     {% if permission == 'PP' %}
     <script type="text/javascript">
         $(function () {
@@ -404,8 +404,8 @@
             $('#getParentFundAmount').click(function(event) {
                 getParentFund();
             });
-            
-            $( "#funds_quantity" ).change(function() {              
+
+            $( "#funds_quantity" ).change(function() {
               $("#add_fund_url").attr("href", "https://xmccamppx.myshopify.com/cart/2688450945:" +  $( "#funds_quantity" ).val())
             });
 
@@ -424,13 +424,13 @@
                             { "title": "Total Amount" },
                             { "title": "Created Time" }
                         ]
-                    });        
+                    });
                 }
                 else if (res.status == 'FAILED') {
                     $('#alert-wrapper').html(error_msg(res.Error));
                 };
             });
-            
+
         })
         function getParentFund () {
             $.get('/Parent/fetch_funds/', function(data) {
@@ -445,10 +445,10 @@
 
     <!-- Generalize -->
     <script type="text/javascript">
-            
+
         /* Preloader --START */
             var $loader = $('#pre_loader');
-            
+
             $(document).ajaxStart(function () {
                 $loader.show();
             })

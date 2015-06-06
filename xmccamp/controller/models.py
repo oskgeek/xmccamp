@@ -130,7 +130,7 @@ class Funds(models.Model):
 
 class Cadet(models.Model):
     GENDER_TYPE = (('MALE', 'MALE'), ('FEMALE', 'FEMALE'))
-    sessions = models.ForeignKey(Session)
+    sessions = models.ForeignKey(Session, blank=True, null=True, editable=False)
     i_cadet = models.AutoField(primary_key=True)
     full_name = models.CharField(max_length=255)
     age_today = models.IntegerField()
@@ -142,11 +142,12 @@ class Cadet(models.Model):
     zip_code = models.CharField(max_length=255, blank=True, null=True)
     email_address = models.EmailField(max_length=255, blank=True, null=True)
     age_session = models.IntegerField(blank=True, null=True)
-    primary_parent = models.ForeignKey(Parent, related_name='primary_parent')
+    primary_parent = models.ForeignKey(Parent, related_name='primary_parent', 
+        verbose_name="Select Cadet's Parent")
     address = models.TextField(blank=True, null=True, verbose_name="Address")
     contact_number = models.IntegerField(blank=True, null=True)
     secondary_parent = models.ForeignKey(
-        Parent, related_name='secondary_parent')
+        Parent, related_name='secondary_parent', blank=True, null=True, editable=False)
     usac_training_program = models.CharField(
         max_length=255, blank=True, null=True)
     goal = models.TextField(
@@ -255,10 +256,10 @@ class RevertTransaction(models.Model):
 
 class StickyNotes(models.Model):
     i_note = models.AutoField(primary_key=True)
-    i_parent = models.ForeignKey(Parent, blank=True, null=True)
-    i_cadet = models.ForeignKey(Cadet, blank=True, null=True)
-    issued_by = models.ForeignKey(UserProfile)
-    issued_time = models.DateTimeField(default=datetime.datetime.now)
+    i_parent = models.ForeignKey(Parent, blank=True, null=True, verbose_name='Please select Parent')
+    i_cadet = models.ForeignKey(Cadet, blank=True, null=True, verbose_name='Please select Cadet')
+    issued_by = models.ForeignKey(UserProfile, editable=False)
+    issued_time = models.DateTimeField(default=datetime.datetime.now, editable=False)
     remarks = models.TextField()
 
     def __unicode__(self):

@@ -97,6 +97,29 @@ class CadetUpdate(UpdateView):
     @classmethod
     def as_view(cls):
         return login_required(super(CadetUpdate, cls).as_view())
+        
+
+class CadetCreate(CreateView):
+    model = Cadet
+    fields = ['primary_parent', 'full_name', 'age_today', 'gender', 'email_address',
+              'zip_code', 'city', 'state', 'country']
+    template_name = 'controller/pages/cadets/cadet_create_form.html'
+    success_url = '/cadets_list/'
+
+    def get_context_data(self, **kwargs):
+        context = super(CadetCreate, self).get_context_data(**kwargs)
+        context['permission'] = self.request.user.userprofile.group
+        return context
+
+    def form_valid(self, form):    
+        messages.success(
+            self.request, "Successfully created cadet account for %s." % form.cleaned_data['full_name'])
+        return super(CadetCreate, self).form_valid(form)
+
+    @classmethod
+    def as_view(cls):
+        return login_required(super(CadetCreate, cls).as_view())
+        
 
 
 @login_required
@@ -296,6 +319,54 @@ class ParentUpdate(UpdateView):
     @classmethod
     def as_view(cls):
         return login_required(super(ParentUpdate, cls).as_view())
+
+
+class ParentCreate(CreateView):
+    model = Parent
+    fields = ['full_name', 'gender', 'email_address', 'cell_phone_number',
+              'business_phone_number', 'home_phone_number']
+    template_name = 'controller/pages/parents/parent_create_form.html'
+    success_url = '/parent_list/'
+
+    def get_context_data(self, **kwargs):
+        context = super(ParentCreate, self).get_context_data(**kwargs)
+        context['permission'] = self.request.user.userprofile.group
+        return context
+
+    def get_form(self, form_class):
+        form = super(ParentCreate, self).get_form(form_class)
+        form.fields['Balance'] = forms.CharField(initial=0)
+        return form
+
+    def form_valid(self, form):    
+        email_address = form.cleaned_data['email_address']
+        user = User.objects.create_user(
+            username=email_address, password=email_address, email=email_address)
+        user.save()
+        user_profile = UserProfile()
+        user_profile.group = 'PP'
+        user_profile.user = user
+        user_profile.save()
+        form.instance.user = user_profile
+        form.instance.save()
+            
+        remaining_amount = form.cleaned_data['Balance']
+        funds_obj = Funds()
+        funds_obj.parent = form.instance
+        funds_obj.amount = remaining_amount
+        funds_obj.remaining_amount = remaining_amount
+        funds_obj.currency = 'USD'
+        funds_obj.name = 'Manual'
+        funds_obj.recieved_time = datetime.datetime.now()
+        funds_obj.save()
+        
+        messages.success(
+            self.request, "Successfully created parent account for %s." % form.cleaned_data['full_name'])
+        return super(ParentCreate, self).form_valid(form)
+
+    @classmethod
+    def as_view(cls):
+        return login_required(super(ParentCreate, cls).as_view())
 
 
 @login_required
@@ -733,7 +804,6 @@ def reset_password(request):
     return HttpResponse(json.dumps(response_dict))
 
 
-
 class StickyNotesList(ListView):
     model = StickyNotes
     fields = '__all__'
@@ -751,22 +821,17 @@ class StickyNotesList(ListView):
 
 class StickyNotesCreate(CreateView):
     model = StickyNotes
-    fields = ['full_name', 'email_address', 'password', 'account_type']
-    template_name = 'controller/pages/accounts/account_create_form.html'
-    success_url = '/Admin/accounts/'
+    fields = '__all__'
+    template_name = 'controller/pages/sticky_notes/sticky_notes_create_form.html'
+    success_url = '/notes/'
 
     def get_context_data(self, **kwargs):
         context = super(StickyNotesCreate, self).get_context_data(**kwargs)
         context['permission'] = self.request.user.userprofile.group
         return context
 
-    def get_form(self, form_class):
-        form = super(StickyNotesCreate, self).get_form(form_class)
-        form.fields['password'].widget = forms.PasswordInput()
-        return form
-
     def form_valid(self, form):
-        email = form.cleaned_data['email_address']
+        form.instance.issued_by = self.request.user.userprofile
         return super(StickyNotesCreate, self).form_valid(form)
 
     @classmethod

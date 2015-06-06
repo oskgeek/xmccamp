@@ -1,6 +1,6 @@
 from django.conf.urls import url
 from controller.views import ProductList, ProductCreate, ProductUpdate, ProductDelete, \
-    PXStaffList, PXStaffCreate, PXStaffUpdate, PXStaffDelete, ParentUpdate, CadetUpdate, TransactionList, ApprovalPendingTransactionList
+    PXStaffList, PXStaffCreate, PXStaffUpdate, PXStaffDelete, ParentUpdate, CadetUpdate, TransactionList, ApprovalPendingTransactionList, StickyNotesList, StickyNotesCreate, ParentCreate, CadetCreate
 
 
 urlpatterns = [
@@ -35,8 +35,10 @@ urlpatterns = [
         PXStaffUpdate.as_view(), name='accounts_update'),
     url(r'Admin/accounts/(?P<pk>[0-9]+)/delete/$',
         PXStaffDelete.as_view(), name='accounts_delete'),
+    url(r'Parent/create/$', ParentCreate.as_view()),
     url(r'Parent/update/(?P<pk>[0-9]+)/$', ParentUpdate.as_view()),
     url(r'Cadet/update/(?P<pk>[0-9]+)/$', CadetUpdate.as_view()),
+    url(r'Cadet/create/$', CadetCreate.as_view()),
     url(r'Cadet/add_reward/(?P<pk>[0-9]+)/$',
         'controller.views.add_cadet_reward'),
     url(r'Canteen/sales_history/$',
@@ -52,5 +54,8 @@ urlpatterns = [
     url(r'^Admin/revert_trasaction_confirm/(?P<pk>[0-9]+)/$',
         'controller.views.revert_trasaction_confirm'),
     url(r'^reset_password/$', 'controller.views.reset_password'),
+    
+    url(r'notes/$', StickyNotesList.as_view(), name='notes_list'),
+    url(r'notes/create/$', StickyNotesCreate.as_view()),
 
 ]

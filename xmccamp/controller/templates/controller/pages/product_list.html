@@ -143,6 +143,15 @@
 
             $('#modalYeah').attr('href', $(this).attr('data-url'));
         });
+        
+        $('#dataTables-example').on( 'page.dt', function () {
+            var table = $('#dataTables-example').DataTable();
+            var rows = table.rows({ page: 'current' }).nodes();
+            $(rows).each(function(index, el) {
+                var product_id = $(this).find('td:first').text();     
+                $(this).find('td:last .edit-product').attr('href', '/Canteen/product/'+product_id+'/');
+            });
+        });
     });
     </script>
     <!-- Modal -->

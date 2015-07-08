@@ -159,8 +159,8 @@
             });
 
             $('.edit-cadet').each(function(index, el) {
-                var parent_id = $(this).parents('tr:first').find('td:first').text();
-                $(this).attr('href', '/Cadet/update/'+parent_id+'/');
+                var cadet_id = $(this).parents('tr:first').find('td:first').text();
+                $(this).attr('href', '/Cadet/update/'+cadet_id+'/');
             });
 
             $('.add-reward').each(function(index, el) {
@@ -168,6 +168,15 @@
                 $(this).attr('href', '/Cadet/add_reward/'+ row_content[ 10 ] + '/');
             });
 
+        });
+        
+        $('#dataTables-example').on( 'page.dt', function () {
+            var table = $('#dataTables-example').DataTable();
+            var rows = table.rows({ page: 'current' }).nodes();
+            $(rows).each(function(index, el) {
+                var cadet_id = $(this).find('td:first').text();     
+                $(this).find('td:last .edit-cadet').attr('href', '/Cadet/update/'+cadet_id+'/');
+            });
         });
     });
     </script>

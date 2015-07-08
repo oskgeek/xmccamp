@@ -159,6 +159,15 @@
             });
 
         });
+        
+        $('#dataTables-example').on( 'page.dt', function () {
+            var table = $('#dataTables-example').DataTable();
+            var rows = table.rows({ page: 'current' }).nodes();
+            $(rows).each(function(index, el) {
+                var transaction_id = $(this).find('td:first').text();     
+                $(this).find('td:last .del-product').attr('data-url', '/Canteen/revert_trasaction/'+transaction_id+'/');
+            });
+        });
     });
     </script>
     <!-- Modal -->

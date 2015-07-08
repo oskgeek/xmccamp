@@ -153,6 +153,16 @@
             });
 
         });
+        
+ 
+        $('#dataTables-example').on( 'page.dt', function () {
+            var table = $('#dataTables-example').DataTable();
+            var rows = table.rows({ page: 'current' }).nodes();
+            $(rows).each(function(index, el) {
+                var parent_id = $(this).find('td:first').text();     
+                $(this).find('td:last .edit-parent').attr('href', '/Parent/update/'+parent_id+'/');
+            });
+        });
     });
     </script>
 </body>

@@ -143,8 +143,8 @@
         });
 
         $('.edit-product').each(function(index, el) {
-            var product_id = $(this).parents('tr:first').find('td:first').text();
-            $(this).attr('href', '/Admin/accounts/'+product_id+'/');
+            var account_id = $(this).parents('tr:first').find('td:first').text();
+            $(this).attr('href', '/Admin/accounts/'+account_id+'/');
         });
         $('.del-product').each(function(index, el) {
             var product_id = $(this).parents('tr:first').find('td:first').text();
@@ -155,6 +155,15 @@
             $('#confirmModal').modal('show');
 
             $('#modalYeah').attr('href', $(this).attr('data-url'));
+        });
+        
+        $('#dataTables-example').on( 'page.dt', function () {
+            var table = $('#dataTables-example').DataTable();
+            var rows = table.rows({ page: 'current' }).nodes();
+            $(rows).each(function(index, el) {
+                var account_id = $(this).find('td:first').text();     
+                $(this).find('td:last .del-product').attr('data-url', '/Admin/accounts/'+account_id+'/');
+            });
         });
     });
     </script>
